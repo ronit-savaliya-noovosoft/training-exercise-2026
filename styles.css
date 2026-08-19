@@ -1,0 +1,242 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    font-family: "Franklin Gothic Medium";
+    background-color: whitesmoke;
+}
+
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+header{
+    background-color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    opacity: 0.95;
+}
+
+nav{
+    display: flex;
+    gap: 10px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+
+.title {
+    font-size: 1.5rem;
+}
+
+main{
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+.home {
+    position: relative;
+    height: 400px;
+    /*border: 1px solid black;*/
+}
+
+.home-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.home-text h2{
+    font-size: xx-large;
+    margin-bottom: 20px;
+}
+
+.home-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 2rem;
+    margin: 2rem;
+    max-width: 70%;
+    height: 100%;
+}
+
+button{
+    background: black;
+    color: white;
+    font-size: 15px;
+    border-radius: 30px;
+    width: 50%;
+    height: 50px;
+    letter-spacing: 1px;
+    margin-top: 30px;
+}
+
+/*for deskop view*/
+
+/*img{*/
+/*    width: 98vw;*/
+/*    height: 100vh;*/
+/*    object-fit: cover;*/
+/*    object-position: 100% 50%;*/
+/*}*/
+
+/*img .home-img{*/
+/*    width: 100vw;*/
+/*    height: 100vh;*/
+/*    object-fit: cover;*/
+/*    object-position: 40% 100%;*/
+/*}*/
+
+img {
+    border-radius: 1rem;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    margin: 1rem 0;
+}
+
+
+.detail-section {
+    display: flex;
+    border: 1px solid black;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.detail {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.detail-heading{
+    text-align: center;
+}
+
+.detail-text{
+    width: 100%;
+    height: 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.detail-links {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+    width: 100%;
+    margin-top: 30px;
+}
+
+.detail-links a {
+    background-color: #f65472;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    text-align: center;
+    width: 50%;
+}
+
+
+.contact {
+    text-align: center;
+}
+
+.right {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.left{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.contactus{
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+}
+
+.contact-img {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 1rem;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 600px;
+}
+
+.contact-form input{
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #CCFFFF;
+    border-radius: 1rem;
+}
+.contact-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #CCCCFF;
+    border-radius: 1rem;
+}
+
+
+footer {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 2rem;
+    background: black;
+    color: white;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.about{
+    width: 35%;
+}
+.footer div {
+    flex: 1;
+    min-width: 200px;
+}
+
+div .contact{
+    display: flex;
+    flex-direction: column;
+}
+
+.social label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
