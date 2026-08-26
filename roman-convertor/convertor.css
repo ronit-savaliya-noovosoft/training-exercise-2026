@@ -1,0 +1,78 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    font-family: "Franklin Gothic Medium";
+    background-color: whitesmoke;
+}
+
+header{
+    background-color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: xx-large;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    opacity: 0.95;
+}
+
+main{
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 20px;
+}
+
+.label{
+    font-size: 25px;
+    text-align: center;
+    margin-top: 70px;
+}
+
+
+#inputValue{
+    background-color: #CADCFC;
+    border: none;
+    border-radius: 10px;
+    width: 500px;
+    height: 40px;
+    padding: 15px;
+    font-size: larger;
+}
+
+#convertBtn{
+    background-color: #00246B;
+    color: #FFFFFF;
+    font-weight: bold;
+    border-radius: 30px;
+    font-size: large;
+    border: none;
+    height: 40px;
+    width: 150px;
+}
+
+#toggleBtn{
+    background-color: #00246B;
+    color: #FFFFFF;
+    font-weight: bold;
+    border-radius: 30px;
+    font-size: large;
+    border: none;
+    height: 40px;
+    width: 250px;
+}
+
+.result{
+    text-align: center;
+    margin-top: 30px;
+    font-size: 20px;
+
+}
