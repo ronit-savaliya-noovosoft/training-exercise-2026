@@ -16,6 +16,12 @@ const input = document.getElementById("inputValue");
 const result = document.getElementById("result");
 const convertBtn = document.getElementById("convertBtn");
 
+input.addEventListener('keydown', function (event){
+    if (event.key === 'Enter') {
+        convertBtn.click();
+    }
+});
+
 toggleBtn.addEventListener("click", ()=>{
     mode = !mode;
 
@@ -46,6 +52,10 @@ convertBtn.addEventListener("click", ()=>{
         result.textContent = romanToNumber(value);
     }
     else{
+        if(Number.isNaN(Number(value))){
+            result.textContent = "Not Valid Input!";
+            return;
+        }
         result.textContent = numberToRoman(Number(value));
         console.log(result.textContent);
     }
@@ -66,6 +76,7 @@ function numberToRoman(number){
             count+=1;
         }
 
+        // 9 90 900
         if(i>=2){
             const sub = values[i]-values[i-2];
             console.log(`${number} ${sub} ${values[i]}`);
@@ -87,7 +98,7 @@ function numberToRoman(number){
         // }
         // 27 not worked
 
-        if(count==4){
+        if(count===4){
             roman=roman.slice(0, -4);
             roman+=symbols[char]+symbols[char+1];
         }
@@ -98,6 +109,12 @@ function numberToRoman(number){
 }
 
 function romanToNumber(roman){
+    const romanRegex = /^(?=.)M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/i;
+
+    if(!romanRegex.test(roman)){
+        return "Not Valid Input!";
+    }
+
     var num = 0;
     const values = {
         I: 1,

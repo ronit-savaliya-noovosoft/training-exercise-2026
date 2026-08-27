@@ -37,7 +37,6 @@ main{
     margin-top: 70px;
 }
 
-
 #inputValue{
     background-color: #CADCFC;
     border: none;
@@ -74,5 +73,9 @@ main{
     text-align: center;
     margin-top: 30px;
     font-size: 20px;
+}
 
+.note{
+    text-align: center;
+    margin-top: 40px;
 }
