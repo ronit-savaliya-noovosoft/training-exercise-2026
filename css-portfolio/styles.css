@@ -5,7 +5,7 @@
 }
 
 body{
-    font-family: "Franklin Gothic Medium";
+    font-family: "Franklin Gothic Medium", "serif";
     background-color: whitesmoke;
 }
 
@@ -88,7 +88,7 @@ button{
     margin-top: 30px;
 }
 
-/*for deskop view*/
+/*for desktop view*/
 
 /*img{*/
 /*    width: 98vw;*/
@@ -210,6 +210,11 @@ img {
     border-radius: 1rem;
 }
 
+form label{
+    margin-left: 15px;
+    margin-bottom: -10px;
+}
+
 
 footer {
     display: flex;
@@ -226,9 +231,10 @@ footer {
 .about{
     width: 35%;
 }
-.footer div {
+footer div {
     flex: 1;
     min-width: 200px;
+    text-align: center;
 }
 
 div .contact{

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Audix</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +17,7 @@
         </header>
         <main>
             <section id="home" class="home">
-                <img src="images/background-2.jpg" class="home-img" />
+                <img src="images/background-2.jpg" alt="background image" class="home-img" />
                 <div class="home-text">
                     <h2>HEAR EVERY DETAIL</h2>
                     <p>Welcome to your ultimate sound destination. Shop our premium collection of wireless headphones, noise-cancelling earbuds, and smart home speakers. Enjoy crystal-clear audio, deep bass, and all-day battery life.</p>
@@ -28,19 +28,19 @@
             <section class="detail-section">
                 <div class="detail detail-left">
                     <h2 class="detail-heading">Designed to Stay,Made to Inspire<br> Generations</h2>
-                    <img src="images/girl-with-headphone.jpg" class="detail-img">
+                    <img src="images/girl-with-headphone.jpg" alt="girl-with-headphone" class="detail-img">
                     <p class="detail-text">Experience pure, uninterrupted sound with our next-generation wireless headphones, engineered for true music lovers and busy professionals alike. Featuring custom 40mm drivers and advanced Active Noise Cancellation, these headphones block out the world so you can dive deep into rich bass and crisp, clear highs. Enjoy plush memory-foam ear cushions and a featherlight headband designed for all-day comfort, whether you are working from a busy cafe or traveling across the globe. With an impressive 40-hour battery life, quick-charge technology that gives you three hours of playback from a quick 10-minute charge, and seamless Bluetooth 5.3 connectivity.</p>
                 </div>
 
                 <div class="detail detail-right">
                     <div class="detail-image">
-                        <img src="images/girl-with-headphone-3.jpg" class="image-img">
+                        <img src="images/girl-with-headphone-3.jpg" alt="girl-with-headphone" class="image-img">
                     </div>
                     <div class="detail-text">
                         <h2>Unpack the Technology That Transforms Your Sound</h2>
                         <div class="detail-links">
                             <a href="">Crystal-clear calls with every conversation</a>
-                            <a href="">Sweat & water resistant for active lifestyles</a>
+                            <a href="">Sweat & water-resistant for active lifestyles</a>
                         </div>
                     </div>
                 </div>
@@ -49,14 +49,17 @@
             <section id="contact" class="contactus">
                 <div class="left">
                     <h2>Contact Us</h2>
-                    <img src="images/contact.jpg" class="contact-img" />
+                    <img src="images/contact.jpg" alt="headphone" class="contact-img" />
                 </div>
                 <div class="right">
-                    <form class="contact-form">
-                        <input type="text" placeholder="Name" />
-                        <input type="email" placeholder="Email" />
-                        <textarea placeholder="Enter your message here."></textarea>
-                        <button type="submit">Submit</button>
+                    <form class="contact-form" id="contactForm">
+                        <label for="name">Name</label>
+                        <input type="text" placeholder="Name" id="name" />
+                        <label for="email">Email</label>
+                        <input type="email" placeholder="Email" id="email"/>
+                        <label for="message">Message</label>
+                        <textarea placeholder="Enter your message here." id="message"></textarea>
+                        <button type="submit" id="submitBtn">Submit</button>
                     </form>
                 </div>
             </section>
@@ -70,10 +73,11 @@
                 <p>hammer.studio@gmail.com</p>
             </div>
             <div class="social">
-                <label>Social 1</label>
-                <label>Social 2</label>
+                <label>Instagram</label>
+                <label>YouTube</label>
             </div>
         </footer>
+        <script src="index.js"></script>
     </div>
 </body>
 </html>
