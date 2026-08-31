@@ -54,13 +54,20 @@
                 <div class="right">
                     <form class="contact-form" id="contactForm">
                         <label for="name">Name</label>
-                        <input type="text" placeholder="Name" id="name" />
+                        <input type="text" placeholder="Name" id="name" required/>
                         <label for="email">Email</label>
-                        <input type="email" placeholder="Email" id="email"/>
+                        <input type="email" placeholder="Email" id="email" required/>
                         <label for="message">Message</label>
-                        <textarea placeholder="Enter your message here." id="message"></textarea>
+                        <textarea placeholder="Enter your message here." id="message" required></textarea>
                         <button type="submit" id="submitBtn">Submit</button>
                     </form>
+                </div>
+                <div id="popupModal" class="modal hidden">
+                    <div class="modal-content">
+                        <h2>Success!</h2>
+                        <p>Your details have been submitted.</p>
+                        <button id="closeBtn">Close</button>
+                    </div>
                 </div>
             </section>
         </main>

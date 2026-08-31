@@ -22,3 +22,15 @@ form.addEventListener("submit", function (event){
 
    form.reset();
 });
+
+const modal = document.getElementById('popupModal');
+const closeBtn = document.getElementById('closeBtn');
+
+form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    modal.classList.remove('hidden');
+});
+
+closeBtn.addEventListener('click', function() {
+    modal.classList.add('hidden');
+});
