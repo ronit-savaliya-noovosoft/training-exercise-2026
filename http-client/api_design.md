@@ -562,6 +562,110 @@ Content-Type: application/json
 ````
 
 
+## Admin Access APIs
+
+### 20) Cinema List APIs
+
+- URL: GET /cinemas
+
+  Note: JWT Required
+
+- Headers:
+````
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+````
+
+- Request: Not Required 
+
+- Response:
+````json
+{
+  "data": [
+    {
+      "id": "CN101",
+      "name": "PVR Icon: Pune",
+      "total_screens": 4,
+      ...
+    }
+  ]
+}
+````
+- Status Code: 200(Ok)/204(No Content)
+
+
+### 21) Add Cinema
+
+- URL: POST /cinemas
+
+  Note: JWT Required
+
+- Headers:
+````
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+````
+
+- Request: 
+````json
+{
+      "id": "CN101",
+      "name": "PVR Icon: Pune",
+      "total_screens": 4,
+      ...
+}
+````
+
+- Response: No Required
+
+- Status Code: 200(Ok)/204(No Content)
+
+### 22) Edit Cinema Details
+
+- URL: PATCH /cinemas/{cinema_id}
+
+  Note: JWT Required
+
+- Headers:
+````
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+````
+
+- Request:
+````json
+{
+      "id": "CN101",
+      "name": "PVR Icon: Pune",
+      "total_screens": 4,
+      ...
+}
+````
+
+- Response: No Required
+
+- Status Code: 200(Ok)/204(No Content)
+
+### 23) Delete Cinema
+
+- URL: PATCH /cinemas/{cinema_id}
+
+  Note: JWT Required
+
+- Headers:
+````
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+````
+
+- Request: Not Required 
+
+- Response: Not Required
+
+- Status Code: 200(Ok)/204(No Content)
+
+### Note: As Above, Almost Each Resource have mainly Create, Read, Update and Delete APIs but all of these are restricted 
+
 ### May Failure Status Code for all above APIs
 - 404 - if page is not found(API not exist)
 - 403 - if user have no permission for do that specific task
