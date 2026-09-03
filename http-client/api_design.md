@@ -13,6 +13,7 @@
 - Response:
 ````
 Set-Cookies: access_token=<JWT>
+Content-type: application/json
 ````
 ````json
 {
@@ -23,7 +24,7 @@ Set-Cookies: access_token=<JWT>
 
 ### 1) Movie List API
 
-- URL: GET /movies
+- URL: GET /movies?page=1&limit=10
 
 - Request: Not required
 
@@ -37,6 +38,21 @@ Set-Cookies: access_token=<JWT>
       "genres": ["devotionl","drama"],
       "rating": 9.8,
       "likes": 433000,
+      "_links": {
+        "self": {
+          "href": "/movies/MV101",
+          "action": "GET"
+        },
+        "cast": {
+          "href": "/movies/MV101/cast",
+          "action": "GET"
+        },
+        "crew": {
+          "href": "/movies/MV101/crew",
+          "action": "GET"
+        },
+        ...
+      },
       ...
     },
   ]
@@ -58,6 +74,21 @@ Set-Cookies: access_token=<JWT>
   "title": "hanuman ansh",
   "duration_minutes": 143,
   "certification": "UA13+",
+  "_links": {
+    "self": {
+      "href": "/movies/MV101",
+      "action": "GET"
+    },
+    "cast": {
+      "href": "/movies/MV101/cast",
+      "action": "GET"
+    },
+    "crew": {
+      "href": "/movies/MV101/crew",
+      "action": "GET"
+    },
+    ...
+  },
   ...
 }
 ````
@@ -66,7 +97,7 @@ Set-Cookies: access_token=<JWT>
 
 ### 3) Cast API
 
-- URL: GET /movie/{id}/cast
+- URL: GET /movies/{id}/cast?page=1&limit=10
 
 - Request: Not Required
 
@@ -78,6 +109,13 @@ Set-Cookies: access_token=<JWT>
       "id": "CST101",
       "name": "Chandan Ananad",
       "img_url": "...",
+      "_link": [
+        "self": {
+          "href": "/movies/MV101/cast/CST101",
+          "action": "GET"  
+        },
+        ...
+      ],
       ...
     },
     ...
@@ -89,7 +127,7 @@ Set-Cookies: access_token=<JWT>
 
 ### 4) Crew API
 
-- URL: GET /movies/{id}/crew
+- URL: GET /movies/{id}/crew?page=1&limit=10
 
 - Request: Not Required
 
@@ -100,7 +138,15 @@ Set-Cookies: access_token=<JWT>
     {
       "id": "CRW101",
       "name": "Vishal Chaturvedi",
-      "roles": ["director", "producer"]
+      "roles": ["director", "producer"],
+      "_link": [
+        "self": {
+          "href": "/movies/MV101/cast/CST101",
+          "action": "GET"
+        },
+        ...
+      ],
+      ...
     },
     ...
   ]
@@ -114,6 +160,12 @@ Set-Cookies: access_token=<JWT>
 - URL: POST /movies/{id}/rating
 
     Note: JWT Required
+
+- Headers:
+````
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+````
 
 - Request: 
 ````json
@@ -189,7 +241,7 @@ Set-Cookies: access_token=<JWT>
 
 - Status Code: 200(Ok)
 
-### 8) Movie Showtimes API
+### 8) Movie Showtime API
 
 - URL: GET /movies/{id}/shows
 
@@ -288,6 +340,12 @@ Content-Type: application/json
 
     Note: JWT Required
 
+- Headers:
+````
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+````
+
 - Request: Not Required
 
 - Response:
@@ -308,7 +366,7 @@ Content-Type: application/json
 
 ### 13) Events API
 
-- URL: GET /events/categories
+- URL: GET /events/categories?page=1&limit=10
 
 - Request: Not Required
 
@@ -331,7 +389,7 @@ Content-Type: application/json
 
 ### 14) Activities API
 
-- URL: GET /activities
+- URL: GET /activities?page=1&limit=10
 
 - Request: Not Required
 
@@ -354,7 +412,7 @@ Content-Type: application/json
 
 ### 15) Plays API
 
-- URL: GET /plays
+- URL: GET /plays?page=1&limit=10
 
 - Request: Not Required
 
@@ -404,6 +462,12 @@ Content-Type: application/json
 
   Note: JWT Required
 
+- Headers:
+````
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+````
+
 - Request:
 ````json
 {
@@ -429,6 +493,11 @@ Content-Type: application/json
 
     Note: JWT Required
 
+- Headers:
+````
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+````
 - Request: Not Required
 
 - Response:
@@ -439,7 +508,37 @@ Content-Type: application/json
 }
 ````
 
-- Status Code: 200(Ok)
+- Status Code: 200(Ok)/204(No Content)
+
+### 19) Reschedule or Change the seats
+
+- URL: PATCH /movies/{movie_id}/booking/{booking_id}/reschedule
+
+    Note: JWT Required
+
+- Headers:
+````
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+````
+
+- Request: 
+````json
+{
+  "seats": ["B1", "B2"],
+  "start_time": "11:00 PM",
+  ...
+}
+````
+- Response:
+````json
+{
+  "booking_id": "BK101",
+  "amount": 700,
+  "status": "pending_payment",
+  ...
+}
+````
 
 
 ### May Failure Status Code for all above APIs
@@ -448,6 +547,8 @@ Content-Type: application/json
 - 401 - user if not authorized
 - 429 - too many requests at a time
 
+
+## Common Response DTO
 
 ### API response
 
@@ -458,5 +559,16 @@ Content-Type: application/json
   "data": object,
   "statusCode": 200,
   "errors": []
+}
+````
+
+### Page Results
+
+````json
+{
+  "items": [...],
+  "total_count": 100,
+  "page": 1,
+  "limit": 10
 }
 ````
