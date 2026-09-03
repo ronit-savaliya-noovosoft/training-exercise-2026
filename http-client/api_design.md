@@ -201,6 +201,13 @@ Content-Type: application/json
       "id": "TR101",
       "title": "hanuman ansh teaser",
       "languages": ["Hindi", "English"],
+      "_links": [
+        "self": {
+          "href": "/movies/MV101/trailers/TR101",
+          "action": "GET"
+        },
+        ...
+      ],
       ...
     }
   ]
@@ -232,6 +239,13 @@ Content-Type: application/json
       "id": "CN101",
       "name": "PVR: Icon",
       "address": "...",
+      "_links": [
+        "self": {
+          "href": "/cinemas/CN101",
+          "action": "GET"
+        },
+        ...
+      ],
       ...
     },
     ...
@@ -265,6 +279,13 @@ Content-Type: application/json
       "cinema_id": "CN101",
       "start_time": "10:30 PM",
       "address": "...",
+      "_links": [
+        "self": {
+          "href": "/movies/MV101/shows/CN101",
+          "action": "GET"
+        },
+        ...
+      ],
       ...
     },
     ...
