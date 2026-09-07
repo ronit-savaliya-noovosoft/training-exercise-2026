@@ -1,0 +1,73 @@
+services:
+  mongodb:
+    image: mongo:8
+    container_name: quickbill-mongodb
+
+    restart: unless-stopped
+
+    environment:
+      MONGO_INITDB_DATABASE: quickbill
+
+    volumes:
+      - mongodb_data:/data/db
+
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - quickbill-network
+
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: quickbill-backend
+
+    restart: unless-stopped
+
+    environment:
+      PORT: 5000
+      MONGODB_URL: mongodb://mongodb:27017/quickbill
+
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+
+    ports:
+      - "5000:5000"
+
+    networks:
+      - quickbill-network
+
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    container_name: quickbill-frontend
+
+    restart: unless-stopped
+
+    depends_on:
+      backend:
+        condition: service_started
+
+    ports:
+      - "3000:80"
+
+    networks:
+      - quickbill-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  quickbill-network:
+    driver: bridge
