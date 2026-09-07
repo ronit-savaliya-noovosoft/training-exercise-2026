@@ -648,7 +648,7 @@ Content-Type: application/json
 
 ### 23) Delete Cinema
 
-- URL: PATCH /cinemas/{cinema_id}
+- URL: DELETE /cinemas/{cinema_id}
 
   Note: JWT Required
 
