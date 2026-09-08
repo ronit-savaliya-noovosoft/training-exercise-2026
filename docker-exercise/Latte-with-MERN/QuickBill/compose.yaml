@@ -1,4 +1,24 @@
 services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: quickbill
+      POSTGRES_USER: ronit_savaliya
+      POSTGRES_PASSWORD: *
+
+    ports:
+      - "7000:7000"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    networks:
+      - quickbill-network
+
   mongodb:
     image: mongo:8
     container_name: quickbill-mongodb
