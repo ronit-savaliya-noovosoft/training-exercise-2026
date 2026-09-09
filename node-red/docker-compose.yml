@@ -1,0 +1,14 @@
+services:
+  node-red:
+    image: nodered/node-red:latest
+    container_name: mynodered
+    environment:
+      - TZ=America/New_York
+    ports:
+      - "1880:1880"
+    volumes:
+      - node_red_data:/data
+    restart: always
+
+volumes:
+  node_red_data:
