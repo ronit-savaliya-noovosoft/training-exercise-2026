@@ -221,6 +221,7 @@ function histogram(svg){
     });
 }
 
+// If a point is above or below LCL or UCL.
 function verify_rule1(svg){
     reset(svg);
 
@@ -231,6 +232,7 @@ function verify_rule1(svg){
     }
 }
 
+//  if 5 consecutive points are monotonously increasing/decreasing.
 function verify_rule2(svg){
     reset(svg);
 
@@ -257,6 +259,7 @@ function verify_rule2(svg){
     }
 }
 
+// if 6 consecutive points are on either side of target.
 function verify_rule3(svg){
     reset(svg);
 
@@ -282,6 +285,7 @@ function verify_rule3(svg){
     }
 }
 
+// Fourteen consecutive data points alternating up & down.
 function verify_rule4(svg){
     reset(svg);
 
@@ -312,7 +316,7 @@ function verify_rule4(svg){
     }
 }
 
-// 42 38
+// Two data points, out of three consecutive data points, are on the same side of the average in zone A or beyond.
 function verify_rule5(svg){
     reset(svg);
 
@@ -332,8 +336,62 @@ function verify_rule5(svg){
         }
 
         if(upper>=2 || lower>=2){
-            for (let j=i-1; j<i; j++){
-                drawCircle(hists, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+            for (let j=i-2; j<=i; j++){
+                if(window.histogram_data[j]>=42 || window.histogram_data[j]<=38){
+                    drawCircle(hists, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                }
+            }
+        }
+    }
+}
+
+// Four data points, out of five consecutive data points, are on the same side of the average in zone B or beyond.
+function verify_rule6(svg){
+    reset(svg);
+
+    for(let i=4; i<=60; i++){
+
+        let upper = 0;
+        let lower = 0;
+
+        for(let j=i-4; j<=i; j++){
+            if(window.histogram_data[j]<=39){
+                lower += 1;
+            }
+
+            if(window.histogram_data[j]>=41){
+                upper += 1;
+            }
+        }
+
+        if(upper>=4 || lower>=4){
+            for (let j=i-4; j<=i; j++){
+                if(window.histogram_data[j]<=39 || window.histogram_data[j]>=41){
+                    drawCircle(hists, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                }
+            }
+        }
+    }
+}
+
+// Fifteen consecutive data points are within zone C (above and below the average).
+function verify_rule7(svg){
+    reset(svg);
+
+    for(let i=14; i<=60; i++){
+
+        let inside = true;
+
+        for(let j=i-14; j<=i; j++){
+            if(window.histogram_data[j]<39 || window.histogram_data[j]>41){
+                inside = false;
+                break;
+            }
+        }
+
+        if(inside){
+            for (let j=i-14; j<=i; j++){
+                    drawCircle(hists, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
             }
         }
     }
