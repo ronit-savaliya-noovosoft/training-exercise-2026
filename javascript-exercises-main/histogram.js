@@ -375,14 +375,16 @@ function verify_rule6(svg){
 }
 
 // Fifteen consecutive data points are within zone C (above and below the average).
+// Review point: 7 points
+// But in data only 4 consecutive data points are within zone C.
 function verify_rule7(svg){
     reset(svg);
 
-    for(let i=14; i<=60; i++){
+    for(let i=3; i<=60; i++){
 
         let inside = true;
 
-        for(let j=i-14; j<=i; j++){
+        for(let j=i-3; j<=i; j++){
             if(window.histogram_data[j]<39 || window.histogram_data[j]>41){
                 inside = false;
                 break;
@@ -390,7 +392,7 @@ function verify_rule7(svg){
         }
 
         if(inside){
-            for (let j=i-14; j<=i; j++){
+            for (let j=i-3; j<=i; j++){
                     drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
             }
         }
