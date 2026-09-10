@@ -1,7 +1,7 @@
 const bars = document.getElementById('svg2');
-bar_chart(bars);
+histogram(bars);
 
-function bar_chart(svg){
+function histogram(svg){
     for (let i = 0; i <= 12; i += 1) {
         // axis ticks
         drawLine(svg, {x1: 40 + 30 * i, y1: 380, x2: 40 + 30 * i, y2: 384});
@@ -115,17 +115,17 @@ function bar_chart(svg){
     });
 }
 
-hists = document.getElementById('svg3');
-histogram(hists);
+plots = document.getElementById('svg3');
+controlplot(plots);
 
 function reset(svg){
     for (let i = 1; i <= 60; i += 1) {
         // console.log(Math.max(...window.histogram_data));
-        drawCircle(hists, {cx: 35 + 30 * i, cy: 20 + 30 * (46 - window.histogram_data[i - 1]), r: 3, fill: 'green'});
+        drawCircle(plots, {cx: 35 + 30 * i, cy: 20 + 30 * (46 - window.histogram_data[i - 1]), r: 3, fill: 'green'});
     }
 }
 
-function histogram(svg){
+function controlplot(svg){
     reset(svg);
 
     for (let i = 1; i <= 60; i += 1) {
@@ -227,7 +227,7 @@ function verify_rule1(svg){
 
     for(let i=1; i<=60; i++){
         if(window.histogram_data[i-1]>43 || window.histogram_data[i-1]<37){
-            drawCircle(hists, {cx: 35 + 30 * i, cy: 20 + 30 * (46 - window.histogram_data[i-1]), r: 3, fill: 'red'});
+            drawCircle(plots, {cx: 35 + 30 * i, cy: 20 + 30 * (46 - window.histogram_data[i-1]), r: 3, fill: 'red'});
         }
     }
 }
@@ -253,7 +253,7 @@ function verify_rule2(svg){
 
         if(inc || dec){
             for (let j=i-4; j<=i; j++){
-                drawCircle(hists, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
             }
         }
     }
@@ -279,7 +279,7 @@ function verify_rule3(svg){
 
         if(upper || lower){
             for (let j=i-4; j<=i; j++){
-                drawCircle(hists, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
             }
         }
     }
@@ -310,7 +310,7 @@ function verify_rule4(svg){
 
         if(alter){
             for (let j=i-6; j<=i; j++){
-                drawCircle(hists, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
             }
         }
     }
@@ -338,7 +338,7 @@ function verify_rule5(svg){
         if(upper>=2 || lower>=2){
             for (let j=i-2; j<=i; j++){
                 if(window.histogram_data[j]>=42 || window.histogram_data[j]<=38){
-                    drawCircle(hists, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                    drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
                 }
             }
         }
@@ -367,7 +367,7 @@ function verify_rule6(svg){
         if(upper>=4 || lower>=4){
             for (let j=i-4; j<=i; j++){
                 if(window.histogram_data[j]<=39 || window.histogram_data[j]>=41){
-                    drawCircle(hists, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                    drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
                 }
             }
         }
@@ -391,7 +391,7 @@ function verify_rule7(svg){
 
         if(inside){
             for (let j=i-14; j<=i; j++){
-                    drawCircle(hists, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                    drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
             }
         }
     }
