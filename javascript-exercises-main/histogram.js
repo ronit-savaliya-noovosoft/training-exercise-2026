@@ -121,7 +121,7 @@ controlplot(plots);
 function reset(svg){
     for (let i = 1; i <= 60; i += 1) {
         // console.log(Math.max(...window.histogram_data));
-        drawCircle(plots, {cx: 35 + 30 * i, cy: 20 + 30 * (46 - window.histogram_data[i - 1]), r: 3, fill: 'green'});
+        drawCircle(svg, {cx: 35 + 30 * i, cy: 20 + 30 * (46 - window.histogram_data[i - 1]), r: 3, fill: 'green'});
     }
 }
 
@@ -223,20 +223,20 @@ function controlplot(svg){
 
 // If a point is above or below LCL or UCL.
 function verify_rule1(svg){
-    reset(svg);
-
-    for(let i=1; i<=60; i++){
+    for(let i=1; i<60; i++){
         if(window.histogram_data[i-1]>43 || window.histogram_data[i-1]<37){
-            drawCircle(plots, {cx: 35 + 30 * i, cy: 20 + 30 * (46 - window.histogram_data[i-1]), r: 3, fill: 'red'});
+            drawCircle(svg, {cx: 35 + 30 * i, cy: 20 + 30 * (46 - window.histogram_data[i-1]), r: 3, fill: 'red'});
+        }
+        else{
+            drawCircle(svg, {cx: 35 + 30 * i, cy: 20 + 30 * (46 - window.histogram_data[i-1]), r: 3, fill: 'green'});
         }
     }
 }
 
-//  if 5 consecutive points are monotonously increasing/decreasing.
+// if 5 consecutive points are monotonously increasing/decreasing.
 function verify_rule2(svg){
-    reset(svg);
-
-    for(let i=4; i<=60; i++){
+    let check=[];
+    for(let i=4; i<60; i++){
 
         let inc = true;
         let dec = true;
@@ -249,11 +249,16 @@ function verify_rule2(svg){
             if(window.histogram_data[j]>=window.histogram_data[j-1]){
                 dec = false;
             }
+
+            if(!check[j]) {
+                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
+            }
         }
 
         if(inc || dec){
             for (let j=i-4; j<=i; j++){
-                drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                check[j]=true;
+                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
             }
         }
     }
@@ -261,9 +266,9 @@ function verify_rule2(svg){
 
 // if 6 consecutive points are on either side of target.
 function verify_rule3(svg){
-    reset(svg);
+    let check=[];
 
-    for(let i=5; i<=60; i++){
+    for(let i=5; i<60; i++){
         let upper = true;
         let lower = true;
 
@@ -275,11 +280,16 @@ function verify_rule3(svg){
             if(window.histogram_data[j]>=40){
                 lower = false;
             }
+
+            if(!check[j]) {
+                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
+            }
         }
 
         if(upper || lower){
             for (let j=i-4; j<=i; j++){
-                drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                check[j]=true;
+                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
             }
         }
     }
@@ -287,10 +297,10 @@ function verify_rule3(svg){
 
 // Fourteen consecutive data points alternating up & down.
 function verify_rule4(svg){
-    reset(svg);
+    let check = []
 
     // 7 consecutive for now
-    for(let i=6; i<=60; i++){
+    for(let i=6; i<60; i++){
 
         let alter = true;
 
@@ -302,15 +312,20 @@ function verify_rule4(svg){
 
             const curr_dir = curr > prev;
 
-            if (prev_dir == curr_dir){
+            if (prev_dir === curr_dir){
                 alter = false;
-                break;
+                // break;
+            }
+
+            if(!check[j]) {
+                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
             }
         }
 
         if(alter){
             for (let j=i-6; j<=i; j++){
-                drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                check[j]=true;
+                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
             }
         }
     }
@@ -318,9 +333,9 @@ function verify_rule4(svg){
 
 // Two data points, out of three consecutive data points, are on the same side of the average in zone A or beyond.
 function verify_rule5(svg){
-    reset(svg);
+    let check = [];
 
-    for(let i=2; i<=60; i++){
+    for(let i=2; i<60; i++){
 
         let upper = 0;
         let lower = 0;
@@ -333,11 +348,15 @@ function verify_rule5(svg){
             if(window.histogram_data[j]>=42){
                 upper += 1;
             }
+            if(!check[j]) {
+                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
+            }
         }
 
         if(upper>=2 || lower>=2){
             for (let j=i-2; j<=i; j++){
                 if(window.histogram_data[j]>=42 || window.histogram_data[j]<=38){
+                    check[j] = true;
                     drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
                 }
             }
@@ -347,9 +366,9 @@ function verify_rule5(svg){
 
 // Four data points, out of five consecutive data points, are on the same side of the average in zone B or beyond.
 function verify_rule6(svg){
-    reset(svg);
+    let check = [];
 
-    for(let i=4; i<=60; i++){
+    for(let i=4; i<60; i++){
 
         let upper = 0;
         let lower = 0;
@@ -362,11 +381,16 @@ function verify_rule6(svg){
             if(window.histogram_data[j]>=41){
                 upper += 1;
             }
+
+            if(!check[j]) {
+                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
+            }
         }
 
         if(upper>=4 || lower>=4){
             for (let j=i-4; j<=i; j++){
                 if(window.histogram_data[j]<=39 || window.histogram_data[j]>=41){
+                    check[j] = true;
                     drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
                 }
             }
@@ -378,22 +402,27 @@ function verify_rule6(svg){
 // Review point: 7 points
 // But in data only 4 consecutive data points are within zone C.
 function verify_rule7(svg){
-    reset(svg);
+    let check = [];
 
-    for(let i=3; i<=60; i++){
+    for(let i=3; i<60; i++){
 
         let inside = true;
 
         for(let j=i-3; j<=i; j++){
             if(window.histogram_data[j]<39 || window.histogram_data[j]>41){
                 inside = false;
-                break;
+                // break;
+            }
+
+            if(!check[j]) {
+                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
             }
         }
 
         if(inside){
             for (let j=i-3; j<=i; j++){
-                    drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                check[j] = true;
+                drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
             }
         }
     }
