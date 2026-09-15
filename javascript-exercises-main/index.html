@@ -12,7 +12,7 @@
     <p>
         <button id="circle-2-button">Circle 2</button>
     </p>
-    <svg id="svg3" width="1900" height="420" viewBox=" 0 0 1900 420"></svg>
+    <svg id="svg3" width="1900" height="540" viewBox=" 0 0 1900 420"></svg>
 
     <div class="button-box">
         <button onclick="verify_rule1(plots)">Verify rule 1</button>
@@ -22,8 +22,17 @@
         <button onclick="verify_rule5(plots)">Verify rule 5</button>
         <button onclick="verify_rule6(plots)">Verify rule 6</button>
         <button onclick="verify_rule7(plots)">Verify rule 7</button>
-        <button onclick="reset(plots)">Clear</button>
+        <button onclick="static_plot(plots)">Clear</button>
     </div>
+
+    <h2>Realtime data of voltage and temperature in one graph.</h2>
+    <svg id="svg4" width="1900" height="540" viewBox=" 0 0 1900 420"></svg>
+
+    <h2>Average data per 3 minutes of voltage.</h2>
+    <svg id="svg5" width="1900" height="540" viewBox=" 0 0 1900 420"></svg>
+
+    <h2>Average data per 3 minutes of Temperature.</h2>
+    <svg id="svg6" width="1900" height="540" viewBox=" 0 0 1900 420"></svg>
 
     <script src="draw.js"></script>
     <script src="samples.js"></script>

@@ -1,6 +1,7 @@
+// Histogram
+// ==========================================================================
 const bars = document.getElementById('svg2');
 histogram(bars);
-
 function histogram(svg){
     for (let i = 0; i <= 12; i += 1) {
         // axis ticks
@@ -115,18 +116,21 @@ function histogram(svg){
     });
 }
 
-plots = document.getElementById('svg3');
-controlplot(plots);
 
-function reset(svg){
+
+// Static Graph For Verify rules of Control Plot
+plots = document.getElementById('svg3');
+controlplot_for_js(plots);
+
+function static_plot(svg){
     for (let i = 1; i <= 60; i += 1) {
         // console.log(Math.max(...window.histogram_data));
-        drawCircle(svg, {cx: 35 + 30 * i, cy: 20 + 30 * (46 - window.histogram_data[i - 1]), r: 3, fill: 'green'});
+        drawCircle(svg, {cx: 40 + 30 * i, cy: 20 + 30 * (46 - window.histogram_data[i - 1]), r: 3, fill: 'green'});
     }
 }
 
-function controlplot(svg){
-    reset(svg);
+function controlplot_for_js(svg){
+    static_plot(svg);
 
     for (let i = 1; i <= 60; i += 1) {
         // axis ticks
@@ -148,7 +152,6 @@ function controlplot(svg){
     drawLine(svg, {x1: 40, y1: 380, x2: 1850, y2: 380});
     // y-axis
     drawLine(svg, {x1: 40, y1: 20, x2: 40, y2: 380});
-
 
     drawLine(svg, {
         x1: 40,
@@ -225,10 +228,10 @@ function controlplot(svg){
 function verify_rule1(svg){
     for(let i=1; i<60; i++){
         if(window.histogram_data[i-1]>43 || window.histogram_data[i-1]<37){
-            drawCircle(svg, {cx: 35 + 30 * i, cy: 20 + 30 * (46 - window.histogram_data[i-1]), r: 3, fill: 'red'});
+            drawCircle(svg, {cx: 40 + 30 * i, cy: 20 + 30 * (46 - window.histogram_data[i-1]), r: 3, fill: 'red'});
         }
         else{
-            drawCircle(svg, {cx: 35 + 30 * i, cy: 20 + 30 * (46 - window.histogram_data[i-1]), r: 3, fill: 'green'});
+            drawCircle(svg, {cx: 40 + 30 * i, cy: 20 + 30 * (46 - window.histogram_data[i-1]), r: 3, fill: 'green'});
         }
     }
 }
@@ -251,14 +254,14 @@ function verify_rule2(svg){
             }
 
             if(!check[j]) {
-                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
+                drawCircle(svg, {cx: 40 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
             }
         }
 
         if(inc || dec){
             for (let j=i-4; j<=i; j++){
                 check[j]=true;
-                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                drawCircle(svg, {cx: 40 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
             }
         }
     }
@@ -282,14 +285,14 @@ function verify_rule3(svg){
             }
 
             if(!check[j]) {
-                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
+                drawCircle(svg, {cx: 40 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
             }
         }
 
         if(upper || lower){
             for (let j=i-4; j<=i; j++){
                 check[j]=true;
-                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                drawCircle(svg, {cx: 40 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
             }
         }
     }
@@ -318,14 +321,14 @@ function verify_rule4(svg){
             }
 
             if(!check[j]) {
-                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
+                drawCircle(svg, {cx: 40 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
             }
         }
 
         if(alter){
             for (let j=i-6; j<=i; j++){
                 check[j]=true;
-                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                drawCircle(svg, {cx: 40 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
             }
         }
     }
@@ -349,7 +352,7 @@ function verify_rule5(svg){
                 upper += 1;
             }
             if(!check[j]) {
-                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
+                drawCircle(svg, {cx: 40 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
             }
         }
 
@@ -357,7 +360,7 @@ function verify_rule5(svg){
             for (let j=i-2; j<=i; j++){
                 if(window.histogram_data[j]>=42 || window.histogram_data[j]<=38){
                     check[j] = true;
-                    drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                    drawCircle(plots, {cx: 40 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
                 }
             }
         }
@@ -383,7 +386,7 @@ function verify_rule6(svg){
             }
 
             if(!check[j]) {
-                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
+                drawCircle(svg, {cx: 40 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
             }
         }
 
@@ -391,7 +394,7 @@ function verify_rule6(svg){
             for (let j=i-4; j<=i; j++){
                 if(window.histogram_data[j]<=39 || window.histogram_data[j]>=41){
                     check[j] = true;
-                    drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                    drawCircle(plots, {cx: 40 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
                 }
             }
         }
@@ -415,15 +418,336 @@ function verify_rule7(svg){
             }
 
             if(!check[j]) {
-                drawCircle(svg, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
+                drawCircle(svg, {cx: 40 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'green'});
             }
         }
 
         if(inside){
             for (let j=i-3; j<=i; j++){
                 check[j] = true;
-                drawCircle(plots, {cx: 35 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
+                drawCircle(plots, {cx: 40 + 30 * (j+1), cy: 20 + 30 * (46 - window.histogram_data[j]), r: 3, fill: 'red'});
             }
         }
     }
 }
+
+
+// Node-Red Exercise!
+// ==========================================================================
+function controlplot_for_node(svg){
+
+    for (let i = 1; i <= 60; i += 1) {
+        // axis ticks
+        drawLine(svg, {x1: 40 + 30 * i, y1: 380, x2: 40 + 30 * i, y2: 384});
+
+        // axis labels
+        // drawText(svg, {x: 35 + 30 * i, y: 400, text: i});
+    }
+
+    for (let i = 1; i <= 13; i += 1) {
+        // axis ticks
+        drawLine(svg, {x1: 36, y1: 20 + 30 * (i - 1), x2: 40, y2: 20 + 30 * (i - 1)});
+
+        // axis labels
+        drawText(svg, {x: 20, y: 25 + 30 * (i - 1), text: (46 - i + 1)});
+    }
+
+    // x-axis
+    drawLine(svg, {x1: 40, y1: 380, x2: 1850, y2: 380});
+    // y-axis
+    drawLine(svg, {x1: 40, y1: 20, x2: 40, y2: 380});
+
+    drawLine(svg, {
+        x1: 40,
+        y1: 200,
+        x2: 1850,
+        y2: 200,
+        stroke: 'green',
+        strokeWidth: 1,
+        strokeType: 'dashed'
+    });
+
+    drawLine(svg, {
+        x1: 40,
+        y1: 170,
+        x2: 1850,
+        y2: 170,
+        stroke: 'yellow',
+        strokeWidth: 1,
+        strokeType: 'dashed'
+    });
+
+    drawLine(svg, {
+        x1: 40,
+        y1: 230,
+        x2: 1850,
+        y2: 230,
+        stroke: 'yellow',
+        strokeWidth: 1,
+        strokeType: 'dashed'
+    });
+
+    drawLine(svg, {
+        x1: 40,
+        y1: 140,
+        x2: 1850,
+        y2: 140,
+        stroke: 'orange',
+        strokeWidth: 1,
+        strokeType: 'dashed'
+    });
+
+    drawLine(svg, {
+        x1: 40,
+        y1: 260,
+        x2: 1850,
+        y2: 260,
+        stroke: 'orange',
+        strokeWidth: 1,
+        strokeType: 'dashed'
+    });
+
+    drawLine(svg, {
+        x1: 40,
+        y1: 110,
+        x2: 1850,
+        y2: 110,
+        stroke: 'red',
+        strokeWidth: 1,
+        strokeType: 'dashed'
+    });
+
+    drawLine(svg, {
+        x1: 40,
+        y1: 290,
+        x2: 1850,
+        y2: 290,
+        stroke: 'red',
+        strokeWidth: 1,
+        strokeType: 'dashed'
+    });
+}
+
+// Helper Functions
+async function getVoltageData(){
+    const response = await fetch("https://node-red-afd5a-default-rtdb.firebaseio.com/voltage.json");
+    return await response.json();
+}
+
+async function getTemperatureData(){
+    const response = await fetch("https://node-red-afd5a-default-rtdb.firebaseio.com/temperature.json");
+    return await response.json();
+}
+
+async function convertToAvgVolt(){
+    const response = await fetch("https://node-red-afd5a-default-rtdb.firebaseio.com/voltage.json");
+    const data = await response.json();
+
+    const temporary = {};
+
+    for(const [key, value] of Object.entries(data)){
+
+        const avg_time = Math.floor(key/(3*60*1000)) * (3*60*1000);
+
+        if(!temporary[avg_time]){
+            temporary[avg_time] = {sum: 0, count: 0};
+        }
+
+        temporary[avg_time].sum+=value;
+        temporary[avg_time].count+=1;
+    }
+
+    const average = {};
+    for(const avg_time in temporary){
+        const avg_volt = temporary[avg_time].sum / temporary[avg_time].count;
+
+        average[avg_time] = avg_volt.toFixed(2);
+    }
+
+    return average;
+}
+
+async function convertToAvgTemp(){
+    const response = await fetch("https://node-red-afd5a-default-rtdb.firebaseio.com/temperature.json");
+    const data = await response.json();
+
+    const temporary = {};
+
+    for(const [key, value] of Object.entries(data)){
+
+        const avg_time = Math.floor(key/(3*60*1000)) * (3*60*1000);
+
+        if(!temporary[avg_time]){
+            temporary[avg_time] = {sum: 0, count: 0};
+        }
+
+        temporary[avg_time].sum+=value;
+        temporary[avg_time].count+=1;
+    }
+
+    const average = {};
+    for(const avg_time in temporary){
+        const avg_volt = temporary[avg_time].sum / temporary[avg_time].count;
+
+        average[avg_time] = avg_volt.toFixed(2);
+    }
+
+    return average;
+}
+
+
+// Realtime data of voltage and temperature in one graph.
+both = document.getElementById('svg4');
+controlplot_for_node(both);
+
+async function realtime_chart(voltData, tempData){
+    const temperature = Object.values(tempData);
+    const voltage = Object.values(voltData);
+
+    const time_stamp = Object.keys(voltData);
+
+    const oldTempDots = both.querySelectorAll("circle[fill='orange']");
+    oldTempDots.forEach(dot => dot.remove());
+
+    const oldVoltDots = both.querySelectorAll("circle[fill='blue']");
+    oldVoltDots.forEach(dot => dot.remove());
+
+    const oldTexts = both.querySelectorAll('.svg-text[y="400"]');
+    oldTexts.forEach(text => text.remove());
+
+    // plots.innerHTML = '';
+    // controlplot(plots);
+
+    if (!document.getElementById('vertical-timestamp-style')) {
+        document.head.insertAdjacentHTML("beforeend", `
+            <style id="vertical-timestamp-style">
+                .svg-text[y="400"] {
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    transform-box: fill-box;
+                    transform-origin: center;
+                    text-anchor: start;
+                    font-size: 11px;
+                }
+            </style>
+        `);
+    }
+
+    let k = temperature.length-59;
+    for (let i = 1, j=voltage.length-59; i <= 60 && j<=voltage.length; i += 1, j += 1) {
+        if (temperature[k - 1] !== undefined){
+            drawCircle(both, {cx: 40 + 30 * i, cy: 20 + 30 * (46 - temperature[k - 1]), r: 3, fill: 'orange'});
+        }
+
+        if (voltage[j - 1] !== undefined){
+            drawCircle(both, {cx: 40 + 30 * i, cy: 20 + 30 * (46 - voltage[j - 1]), r: 3, fill: 'blue'});
+        }
+
+        drawText(both , {x: 35 + 30 * i, y: 400, text: time_stamp[j-1]});
+        k +=1 ;
+
+    }
+}
+
+const loadRealTimeData = async () => {
+    const voltData = await getVoltageData();
+    const tempData = await getTemperatureData();
+
+    realtime_chart(voltData, tempData);
+}
+
+loadRealTimeData();
+setInterval(loadRealTimeData, 5000);
+
+
+// Average data per 3 minutes of voltage.
+volt = document.getElementById('svg5');
+controlplot_for_node(volt);
+async function voltage_chart(freshData){
+    const voltage = Object.values(freshData);
+    const time_stamp = Object.keys(freshData);
+
+    const oldVoltDots = volt.querySelectorAll("circle[fill='blue']");
+    oldVoltDots.forEach(dot => dot.remove());
+
+    const oldTexts = volt.querySelectorAll('.svg-text[y="400"]');
+    oldTexts.forEach(text => text.remove());
+
+    // plots.innerHTML = '';
+    // controlplot(plots);
+
+    if (!document.getElementById('vertical-timestamp-style')) {
+        document.head.insertAdjacentHTML("beforeend", `
+            <style id="vertical-timestamp-style">
+                .svg-text[y="400"] {
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    transform-box: fill-box;
+                    transform-origin: center;
+                    text-anchor: start;
+                    font-size: 11px;
+                }
+            </style>
+        `);
+    }
+
+    for (let i = 1, j=voltage.length-59; i <= 60 && j<=voltage.length; i += 1, j += 1) {
+        if (voltage[j - 1] === undefined){
+            continue;
+        }
+
+        drawCircle(volt, {cx: 40 + 30 * i, cy: 20 + 30 * (46 - voltage[j - 1]), r: 3, fill: 'blue'});
+        drawText(volt , {x: 35 + 30 * i, y: 400, text: time_stamp[j-1]});
+    }
+}
+
+// Average data per 3 minutes of Temperature.
+temp = document.getElementById('svg6');
+controlplot_for_node(temp);
+async function temperature_chart(freshData){
+    const temperature = Object.values(freshData);
+    const time_stamp = Object.keys(freshData);
+
+    const oldVoltDots = temp.querySelectorAll("circle[fill='orange']");
+    oldVoltDots.forEach(dot => dot.remove());
+
+    const oldTexts = temp.querySelectorAll('.svg-text[y="400"]');
+    oldTexts.forEach(text => text.remove());
+
+    // plots.innerHTML = '';
+    // controlplot(plots);
+
+    if (!document.getElementById('vertical-timestamp-style')) {
+        document.head.insertAdjacentHTML("beforeend", `
+            <style id="vertical-timestamp-style">
+                .svg-text[y="400"] {
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    transform-box: fill-box;
+                    transform-origin: center;
+                    text-anchor: start;
+                    font-size: 11px;
+                }
+            </style>
+        `);
+    }
+
+    for (let i = 1, j=temperature.length-59; i <= 60 && j<=temperature.length; i += 1, j += 1) {
+        if (temperature[j - 1] === undefined){
+            continue;
+        }
+
+        drawCircle(temp, {cx: 40 + 30 * i, cy: 20 + 30 * (46 - temperature[j - 1]), r: 3, fill: 'orange'});
+        drawText(temp , {x: 35 + 30 * i, y: 400, text: time_stamp[j-1]});
+    }
+}
+
+const loadData = async ()=> {
+    const voltData = await convertToAvgVolt();
+    const tempData = await convertToAvgTemp();
+    voltage_chart(voltData);
+    temperature_chart(tempData);
+}
+
+loadData();
+setInterval(loadData,(3*60*1000));
