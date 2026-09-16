@@ -16,3 +16,12 @@ svg {
     gap: 20px;
     margin: 20px;
 }
+
+.svg-text[y="400"] {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    transform-box: fill-box;
+    transform-origin: center;
+    text-anchor: start;
+    font-size: 11px;
+}
