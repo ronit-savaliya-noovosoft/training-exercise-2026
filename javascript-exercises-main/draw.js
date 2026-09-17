@@ -77,11 +77,11 @@ function drawExample(svg) {
         drawLine(svg, {x1: 36, y1: 20 + 30 * (i - 1), x2: 40, y2: 20 + 30 * (i - 1)});
 
         // axis labels
-        drawText(svg, {x: 35 + 30 * i, y: 400, text: i});
+        drawText(svg, {x: 35 + 30 * i, y: 401, text: i});
         drawText(svg, {x: 20, y: 25 + 30 * (i - 1), text: 12 - i + 1});
     }
 
-    drawText(svg, {x: 35, y: 400, text: 0});
+    drawText(svg, {x: 35, y: 401, text: 0});
 
     // x-axis
     drawLine(svg, {x1: 40, y1: 380, x2: 400, y2: 380});

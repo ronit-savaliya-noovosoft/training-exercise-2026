@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
 const firebaseConfig = {
     // apiKey: "YOUR_API_KEY",
@@ -45,7 +45,7 @@ function convertToAvg(data){
 }
 
 // Average data per 3 minutes of voltage.
-let volt = document.getElementById('svg5');
+var volt = document.getElementById('svg5');
 controlplot_for_node(volt);
 function voltage_chart(freshData){
     const voltage = Object.values(freshData);
@@ -66,12 +66,12 @@ function voltage_chart(freshData){
         }
 
         drawCircle(volt, {cx: 40 + 30 * i, cy: 20 + 30 * (46 - voltage[j - 1]), r: 3, fill: 'blue'});
-        drawText(volt , {x: 35 + 30 * i, y: 400, text: time_stamp[j-1]});
+        drawText(volt , {x: 40 + 30 * i, y: 400, text: time_stamp[j-1]});
     }
 }
 
 // Average data per 3 minutes of Temperature.
-let temp = document.getElementById('svg6');
+var temp = document.getElementById('svg6');
 controlplot_for_node(temp);
 function temperature_chart(freshData){
     const temperature = Object.values(freshData);
@@ -92,7 +92,7 @@ function temperature_chart(freshData){
         }
 
         drawCircle(temp, {cx: 40 + 30 * i, cy: 20 + 30 * (46 - temperature[j - 1]), r: 3, fill: 'orange'});
-        drawText(temp , {x: 35 + 30 * i, y: 400, text: time_stamp[j-1]});
+        drawText(temp , {x: 40 + 30 * i, y: 400, text: time_stamp[j-1]});
     }
 }
 
@@ -127,7 +127,7 @@ function realtime_chart(voltData, tempData){
             drawCircle(both, {cx: 40 + 30 * i, cy: 20 + 30 * (46 - voltage[j - 1]), r: 3, fill: 'blue'});
         }
 
-        drawText(both , {x: 35 + 30 * i, y: 400, text: time_stamp[j-1]});
+        drawText(both , {x: 40 + 30 * i, y: 400, text: time_stamp[j-1]});
         k +=1 ;
 
     }
@@ -139,7 +139,7 @@ function realtime_chart(voltData, tempData){
 onValue(voltageRef, (snapshot)=>{
     voltageData = snapshot.val() || {};
 
-    realtime_chart(voltageData, temperatureData);
+    // realtime_chart(voltageData, temperatureData);
     const avgData = convertToAvg(voltageData);
     voltage_chart(avgData);
 })
@@ -147,9 +147,19 @@ onValue(voltageRef, (snapshot)=>{
 onValue(temperatureRef, (snapshot)=>{
     temperatureData = snapshot.val() || {};
 
-    realtime_chart(voltageData, temperatureData);
+    // realtime_chart(voltageData, temperatureData);
     const avgData = convertToAvg(temperatureData);
     temperature_chart(avgData);
 })
 
+Promise.all([
+    get(ref(database, 'voltage')),
+    get(ref(database, 'temperature'))
+]).then(([voltageSnapshot, temperatureSnapshot]) => {
+    const voltageData = voltageSnapshot.val() || {};
+    const temperatureData = temperatureSnapshot.val() || {};
 
+    realtime_chart(voltageData, temperatureData);
+}).catch((error) => {
+    console.error("Error fetching data:", error);
+});

@@ -8,7 +8,7 @@ function histogram(svg){
         drawLine(svg, {x1: 40 + 30 * i, y1: 380, x2: 40 + 30 * i, y2: 384});
 
         // axis labels
-        drawText(svg, {x: 35 + 30 * i, y: 400, text: i+34});
+        drawText(svg, {x: 35 + 30 * i, y: 401, text: i+34});
     }
 
     for (let i = 2; i <= 13; i += 1) {
@@ -527,3 +527,5 @@ function controlplot_for_node(svg){
         strokeType: 'dashed'
     });
 }
+
+
