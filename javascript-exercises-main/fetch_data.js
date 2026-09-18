@@ -45,7 +45,7 @@ function convertToAvg(data){
 }
 
 // Average data per 3 minutes of voltage.
-var volt = document.getElementById('svg5');
+const volt = document.getElementById('svg5');
 controlplot_for_node(volt);
 function voltage_chart(freshData){
     const voltage = Object.values(freshData);
@@ -71,7 +71,7 @@ function voltage_chart(freshData){
 }
 
 // Average data per 3 minutes of Temperature.
-var temp = document.getElementById('svg6');
+const temp = document.getElementById('svg6');
 controlplot_for_node(temp);
 function temperature_chart(freshData){
     const temperature = Object.values(freshData);
@@ -139,7 +139,7 @@ function realtime_chart(voltData, tempData){
 onValue(voltageRef, (snapshot)=>{
     voltageData = snapshot.val() || {};
 
-    // realtime_chart(voltageData, temperatureData);
+    realtime_chart(voltageData, temperatureData);
     const avgData = convertToAvg(voltageData);
     voltage_chart(avgData);
 })
@@ -147,19 +147,19 @@ onValue(voltageRef, (snapshot)=>{
 onValue(temperatureRef, (snapshot)=>{
     temperatureData = snapshot.val() || {};
 
-    // realtime_chart(voltageData, temperatureData);
+    realtime_chart(voltageData, temperatureData);
     const avgData = convertToAvg(temperatureData);
     temperature_chart(avgData);
 })
 
-Promise.all([
-    get(ref(database, 'voltage')),
-    get(ref(database, 'temperature'))
-]).then(([voltageSnapshot, temperatureSnapshot]) => {
-    const voltageData = voltageSnapshot.val() || {};
-    const temperatureData = temperatureSnapshot.val() || {};
-
-    realtime_chart(voltageData, temperatureData);
-}).catch((error) => {
-    console.error("Error fetching data:", error);
-});
+// Promise.all([
+//     get(ref(database, 'voltage')),
+//     get(ref(database, 'temperature'))
+// ]).then(([voltageSnapshot, temperatureSnapshot]) => {
+//     const voltageData = voltageSnapshot.val() || {};
+//     const temperatureData = temperatureSnapshot.val() || {};
+//
+//     realtime_chart(voltageData, temperatureData);
+// }).catch((error) => {
+//     console.error("Error fetching data:", error);
+// });

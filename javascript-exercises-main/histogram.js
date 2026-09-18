@@ -137,7 +137,7 @@ function controlplot_for_js(svg){
         drawLine(svg, {x1: 40 + 30 * i, y1: 380, x2: 40 + 30 * i, y2: 384});
 
         // axis labels
-        drawText(svg, {x: 35 + 30 * i, y: 401, text: i});
+        drawText(svg, {x: 35 + 30 * i, y: 401, text: i.toString()});
     }
 
     for (let i = 1; i <= 13; i += 1) {
