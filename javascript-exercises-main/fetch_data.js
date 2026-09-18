@@ -2,10 +2,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/fireba
 import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
 const firebaseConfig = {
-    // apiKey: "YOUR_API_KEY",
-    databaseURL: "https://node-red-afd5a-default-rtdb.firebaseio.com",
-    projectId: "node-red-afd5a",
+    databaseURL: "$FIREBASE_DATABASE_URL",
+    projectId: "$FIREBASE_PROJECT_ID",
 };
+
+console.log("Firebase Config Initializing with:", firebaseConfig);
 
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
@@ -15,6 +16,20 @@ const temperatureRef = ref(database, "temperature");
 
 let voltageData = [];
 let temperatureData = [];
+
+// ========================================================================
+
+const graph_scale = {
+    x_left : 40,
+    x_gap : 30,
+
+    y_top : 20,
+    y_gap : 30,
+
+    upper_limit : 46,
+
+    y_label_top : 400
+}
 
 // ========================================================================
 
@@ -65,8 +80,8 @@ function voltage_chart(freshData){
             continue;
         }
 
-        drawCircle(volt, {cx: 40 + 30 * i, cy: 20 + 30 * (46 - voltage[j - 1]), r: 3, fill: 'blue'});
-        drawText(volt , {x: 40 + 30 * i, y: 400, text: time_stamp[j-1]});
+        drawCircle(volt, {cx:  graph_scale.x_left + graph_scale.x_gap * i, cy: graph_scale.y_top + graph_scale.y_gap * (graph_scale.upper_limit - voltage[j - 1]), r: 3, fill: 'blue'});
+        drawText(volt , {x:  graph_scale.x_left + graph_scale.x_gap * i, y: graph_scale.y_label_top, text: time_stamp[j-1]});
     }
 }
 
@@ -91,8 +106,8 @@ function temperature_chart(freshData){
             continue;
         }
 
-        drawCircle(temp, {cx: 40 + 30 * i, cy: 20 + 30 * (46 - temperature[j - 1]), r: 3, fill: 'orange'});
-        drawText(temp , {x: 40 + 30 * i, y: 400, text: time_stamp[j-1]});
+        drawCircle(temp, {cx: graph_scale.x_left + graph_scale.x_gap * i, cy: graph_scale.y_top + graph_scale.y_gap * (graph_scale.upper_limit - temperature[j - 1]), r: 3, fill: 'orange'});
+        drawText(temp , {x:  graph_scale.x_left + graph_scale.x_gap * i, y: graph_scale.y_label_top, text: time_stamp[j-1]});
     }
 }
 
@@ -120,14 +135,14 @@ function realtime_chart(voltData, tempData){
     let k = temperature.length-59;
     for (let i = 1, j=voltage.length-59; i <= 60 && j<=voltage.length; i += 1, j += 1) {
         if (temperature[k - 1] !== undefined){
-            drawCircle(both, {cx: 40 + 30 * i, cy: 20 + 30 * (46 - temperature[k - 1]), r: 3, fill: 'orange'});
+            drawCircle(both, {cx: graph_scale.x_left + graph_scale.x_gap * i, cy: graph_scale.y_top + graph_scale.y_gap * (graph_scale.upper_limit - temperature[k - 1]), r: 3, fill: 'orange'});
         }
 
         if (voltage[j - 1] !== undefined){
-            drawCircle(both, {cx: 40 + 30 * i, cy: 20 + 30 * (46 - voltage[j - 1]), r: 3, fill: 'blue'});
+            drawCircle(both, {cx:  graph_scale.x_left + graph_scale.x_gap * i, cy: graph_scale.y_top + graph_scale.y_gap * (graph_scale.upper_limit - voltage[j - 1]), r: 3, fill: 'blue'});
         }
 
-        drawText(both , {x: 40 + 30 * i, y: 400, text: time_stamp[j-1]});
+        drawText(both , {x:  graph_scale.x_left + graph_scale.x_gap * i, y: graph_scale.y_label_top, text: time_stamp[j-1]});
         k +=1 ;
 
     }

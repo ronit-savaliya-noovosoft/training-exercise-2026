@@ -1,5 +1,6 @@
 FROM nginx:alpine
 
-COPY . /usr/share/nginx/html
+COPY index.html /usr/share/nginx/html/
+COPY *.js /usr/share/nginx/html/
 
-EXPOSE 80
+COPY fetch_data.js /etc/nginx/templates/fetch_data.js.template

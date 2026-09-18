@@ -65,4 +65,17 @@ The final plot should look something like below 👇
 > on clicking clear
 <img width="1346" alt="clear" src="https://user-images.githubusercontent.com/78405901/233543758-72e9e357-33d1-46df-8cfa-709a05ff8efa.png">
 
+# Node-Red Exercise
+
+<img src="images/node-red.png">
+
+- Run Commands
+
+````
+docker build -t my-firebase-app .
+````
+
+````
+docker run -d -p 8080:80 --env-file .env -e NGINX_ENVSUBST_OUTPUT_DIR=/usr/share/nginx/html --name my-running-app my-firebase-app
+````
 
