@@ -275,3 +275,86 @@ div .contact{
     display: block;
     margin-bottom: 0.5rem;
 }
+
+/*=====================================================================*/
+
+#submissionsList {
+    display: flex;
+    height: 300px;
+    flex-direction: column;
+    overflow-y: auto;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    gap: 15px;
+}
+
+.submission-card {
+    background: #fdfdfd;
+    padding: 20px;
+    border-radius: 8px;
+    border-top: 5px solid #f65472;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.card-field {
+    font-size: 20px;
+    color: #333;
+}
+
+#customerList{
+    display: flex;
+    flex-direction: row;
+    overflow-y: auto;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    gap: 15px;
+}
+
+.customer-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    width: 200px;
+    background-color: #ffffff;
+}
+
+.card-field.name {
+    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 4px;
+    color: #333333;
+}
+
+.card-field.email {
+    display: block;
+    font-size: 0.85rem;
+    color: #666666;
+    width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: fade;
+}
+
+.delete-btn {
+    background: red;
+    color: white;
+    border: gray 1px solid;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: auto;
+    font-size: 14px;
+    height: 18px;
+    width: 80px;
+    align-self: flex-start;
+}
+
+.delete-btn:hover {
+    background: #bd2130;
+}
