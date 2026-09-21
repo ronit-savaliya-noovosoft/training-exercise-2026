@@ -1,7 +1,5 @@
 # Audix - Hear every detail
 
----
-
 - Run Commands
 
 ````

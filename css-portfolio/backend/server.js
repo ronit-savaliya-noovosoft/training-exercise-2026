@@ -1,9 +1,10 @@
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
 const admin = require('firebase-admin');
 
 const app = express();
-const PORT = 3000;
+const PORT = 5000;
 
 const serviceAccount = require('./firebase-key.json');
 admin.initializeApp({
@@ -11,13 +12,11 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.set('title', 'My Site');
-app.get('title');
 
 app.post('/api/submit', async (req, res) => {
     try {
@@ -58,7 +57,6 @@ app.get('/api/submissions', async (req, res) => {
             });
         });
 
-        console.log(__dirname);
         console.log(submissions);
 
         res.json({

@@ -33,7 +33,7 @@ const customerContainer = document.getElementById('customerList');
 
 async function fetchAndDisplayData() {
     try {
-        const response = await fetch('/api/submissions');
+        const response = await fetch('http://localhost:5000/api/submissions');
         const result = await response.json();
 
         console.log(result);
@@ -63,7 +63,7 @@ async function fetchAndDisplayData() {
 
 async function fetchContacts(){
     try{
-        const response = await fetch('/api/contacts');
+        const response = await fetch('http://localhost:5000/api/contacts');
         const result = await response.json();
 
         console.log(result);
@@ -96,7 +96,7 @@ async function deleteSubmission(id) {
     if (!confirm('Are you sure you want to delete this submission?')) return;
 
     try {
-        const response = await fetch(`/api/submissions/${id}`, {
+        const response = await fetch(`http://localhost:5000/api/submissions/${id}`, {
             method: 'DELETE'
         });
 
@@ -124,7 +124,7 @@ form.addEventListener('submit', async (e) => {
    };
 
    try{
-       const response = await fetch('api/submit', {
+       const response = await fetch('http://localhost:5000/api/submit', {
            method: 'POST',
            headers: { 'Content-Type': 'application/json'},
            body: JSON.stringify(formData)
