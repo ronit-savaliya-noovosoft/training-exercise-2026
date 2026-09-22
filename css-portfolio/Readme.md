@@ -3,9 +3,12 @@
 - Run Commands
 
 ````
-docker build -t express-form-api .
+docker compose up --build
 ````
+### frontend
 
-````
-docker run -p 3000:3000 -v "%cd%":/usr/src/app -v /usr/src/app/node_modules express-form-api
-````
+- visit localhost:8080 - Docker sends that traffic to port 80 inside the Nginx container to serve HTML
+
+### backend
+
+- frontend JS sends a request to localhost:5000 - Docker routes it to port 5000 inside the Express container
