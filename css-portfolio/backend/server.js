@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const admin = require('firebase-admin');
+const validator = require('validator');
 
 const app = express();
 const PORT = 5000;
@@ -16,11 +17,22 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/api/submit', async (req, res) => {
     try {
         const formData = req.body;
+
+        const cleanUsername = formData.name ? validator.trim(formData.name) : '';
+        const cleanEmail = formData.email ? validator.trim(formData.email) : '';
+
+        if (validator.isEmpty(cleanUsername)) {
+            return res.status(400).json({ error: 'Name field cannot be empty.' });
+        }
+
+        if (!validator.isEmail(cleanEmail)) {
+            return res.status(400).json({ error: 'Please provide a valid email address.' });
+        }
 
         const dataToSave = {
             ...formData,
@@ -57,7 +69,7 @@ app.get('/api/submissions', async (req, res) => {
             });
         });
 
-        console.log(submissions);
+        // console.log(submissions);
 
         res.json({
             status: 'success',
