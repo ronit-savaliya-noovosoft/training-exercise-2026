@@ -1,0 +1,11 @@
+services:
+  postgres-db:
+    image: postgres:latest
+    container_name: postgres-sample-compose
+    environment:
+      POSTGRES_PASSWORD: ronit123
+      POSTGRES_DB: dvdrental
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./dvdrental:/tmp/dvdrental
