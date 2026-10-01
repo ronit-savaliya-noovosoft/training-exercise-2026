@@ -117,3 +117,138 @@ GROUP BY customer_name
 ORDER BY total_spent DESC
 LIMIT 10;
 
+-- =============================================================================================================
+-- EXERCISE BY MENTOR
+-- =============================================================================================================
+
+-- 1. Display each store along with the count of currently available stock for each film.
+SELECT i.store_id, f.title, count(i.inventory_id) AS stock
+FROM film f
+JOIN inventory i
+ON f.film_id = i.film_id
+GROUP BY f.title, i.store_id
+ORDER BY stock DESC;
+
+-- 2. Find the top 10 highest-paying customers based on their total payment amount.
+WITH temp AS (
+    SELECT c.customer_id, CONCAT(c.first_name, ' ', c.last_name) as full_name,
+           sum(p.amount) as total_spend,
+           RANK() OVER (ORDER BY sum(p.amount) desc) as rank
+    FROM payment p
+    JOIN customer c
+    ON p.customer_id=c.customer_id
+    GROUP BY c.customer_id, CONCAT(c.first_name, ' ', c.last_name)
+    ORDER BY rank
+)
+SELECT full_name, total_spend
+FROM temp
+WHERE rank<=10;
+
+-- 3. Movie category that has generated the most revenue.
+WITH temp AS (
+    SELECT c.name AS name, count(r.rental_id) as total_rentals, sum(p.amount) as revenue
+    FROM category c
+    JOIN film_category fc
+    ON c.category_id = fc.category_id
+    JOIN inventory i
+    ON fc.film_id = i.film_id
+    JOIN rental r
+    ON i.inventory_id = r.inventory_id
+    JOIN payment p
+    ON r.rental_id = p.rental_id
+    GROUP BY c.name
+)
+SELECT name, revenue FROM temp
+WHERE revenue = (SELECT MAX(revenue) FROM temp);
+
+-- 4. Find pairs of actors who did 5 or more movies together.
+SELECT CONCAT(a1.first_name, ' ', a1.last_name) AS Actor1,
+       CONCAT(a2.first_name, ' ', a2.last_name) AS Actor2,
+       COUNT(*) AS together
+FROM film_actor f1
+         JOIN film_actor f2
+              ON f1.film_id=f2.film_id
+                  AND f1.actor_id<f2.actor_id
+         JOIN actor a1
+              ON f1.actor_id=a1.actor_id
+         JOIN actor a2
+              ON f2.actor_id=a2.actor_id
+GROUP BY Actor1, Actor2
+HAVING count(*)>=5
+ORDER BY together desc;
+
+-- 5. Calculate the total revenue generated per store.
+SELECT s.store_id, sum(p.amount) AS revenue
+FROM store s
+JOIN staff st
+ON s.store_id = st.store_id
+JOIN payment p
+ON st.staff_id = p.staff_id
+GROUP BY s.store_id;
+
+-- 6. Display movie that have more than 3 actors.
+SELECT f.film_id, f.title, COUNT(fa.actor_id) AS no_of_actors
+FROM film f
+JOIN film_actor fa
+ON f.film_id = fa.film_id
+GROUP BY f.film_id
+HAVING COUNT(fa.actor_id)>3
+ORDER BY no_of_actors DESC;
+
+-- 7. Categorize movies based on their duration.(Short , Medium , Long)
+-- Equally divide in 3 set
+WITH temp AS (
+    SELECT f.film_id, f.title, f.length, NTILE(3) over (ORDER BY f.length) AS category
+    FROM film f
+)
+SELECT film_id, title, length,
+       CASE WHEN category=1 THEN 'Short'
+            WHEN category=2 THEN 'Medium'
+            WHEN category=3 THEN 'Long'
+       END AS category
+FROM temp;
+
+-- Based on specific conditions
+SELECT film_id, title, length,
+       CASE WHEN length<=60 THEN 'Short'
+            WHEN length>60 AND length<=120 THEN 'Medium'
+            ELSE 'Long'
+           END AS category
+FROM film
+ORDER BY length;
+
+-- 8. Find the city with the highest number of rentals for each country.
+WITH temp AS (
+    SELECT c.city_id, c.city, co.country, count(rental_id) AS no_of_rentals,
+           DENSE_RANK() OVER (PARTITION BY co.country ORDER BY count(rental_id) DESC)
+    FROM city c
+    JOIN country co
+    ON c.country_id = co.country_id
+    JOIN address a
+    ON c.city_id = a.city_id
+    JOIN customer cu
+    ON a.address_id = cu.address_id
+    JOIN rental r
+    ON cu.customer_id = r.customer_id
+    GROUP BY c.city_id, co.country
+)
+SELECT country, city, no_of_rentals
+FROM temp;
+
+-- 9. Display city with the highest total revenue.
+SELECT c.city_id, c.city, sum(p.amount)
+FROM customer cu
+JOIN payment p
+ON cu.customer_id = p.customer_id
+JOIN address a
+ON cu.address_id = a.address_id
+JOIN city c
+ON a.city_id = c.city_id
+GROUP BY c.city_id, c.city;
+
+-- 10. List each movie title with its corresponding language.
+SELECT f.title, l.name
+FROM film f
+JOIN language l
+ON f.language_id = l.language_id
+ORDER BY f.title;
