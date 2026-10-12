@@ -1,0 +1,34 @@
+services:
+  postgres-db:
+    image: postgres:latest
+    container_name: postgres-moneyorder
+    environment:
+      POSTGRES_PASSWORD: ronit123
+      POSTGRES_DB: moneyorder
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./moneyorder:/tmp/moneyorder
+
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development

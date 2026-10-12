@@ -187,9 +187,9 @@ VALUES
 
 SELECT * from managers;
 
-UPDATE managers
-SET salary = 62000
-WHERE first_name = 'John';
+UPDATE employees
+SET salary = 70000
+WHERE first_name = 'David';
 
 INSERT INTO managers (id, first_name, last_name, salary)
 VALUES (1, 'John', 'Doe', 60000)
@@ -203,3 +203,35 @@ SELECT 'PostgreSQL' ~ 'greS';
 SELECT 'PostgreSQL' ~* 'gres';
 SELECT 'PostgreSQL' !~ 'mysql';
 SELECT 'PostgreSQL' !~* 'MYSQL';
+
+
+SELECT e.first_name, e.salary
+FROM employees e
+WHERE e.salary > All(SELECT salary FROM managers);
+
+SELECT film_id, title, length, rating
+FROM film f
+WHERE length > (
+    SELECT AVG(length)
+    FROM film
+    WHERE rating = f.rating
+);
+
+SELECT
+    first_name,
+    last_name
+FROM
+    customer c
+WHERE
+    NOT EXISTS (
+        SELECT
+            1
+        FROM
+            payment p
+        WHERE
+            p.customer_id = c.customer_id
+          AND amount > 11
+    )
+ORDER BY
+    first_name,
+    last_name;
