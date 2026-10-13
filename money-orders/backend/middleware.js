@@ -1,9 +1,10 @@
-const jwt = required("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
 function authenticateToken(req, res, next){
-    const authHeader = req.headers["authorization"];
+    // const authHeader = req.headers["authorization"];
+    // const token = authHeader && authHeader.split(" ")[1];
 
-    const token = authHeader && authHeader.split(" ")[1];
+    const token = req.cookie.token;
 
     if(!token){
         return res.status(401).json({

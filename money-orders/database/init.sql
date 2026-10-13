@@ -25,6 +25,16 @@ CREATE TABLE TRANSACTIONS (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+INSERT INTO accounts (account_number, cust_id, balance)
+VALUES ('4321 8765 0987 6545', 3, 5000);
+
+SELECT u.id, u.name, a.id, a.account_number, a.balance FROM USERS u
+JOIN ACCOUNTS a
+ON u.id = a.cust_id
+WHERE role='customer';
+
+SELECT * FROM TRANSACTIONS;
+
 SELECT current_database() AS database;
 DROP TABLE users;
 DROP TABLE accounts;
