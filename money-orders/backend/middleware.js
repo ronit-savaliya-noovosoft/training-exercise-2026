@@ -1,10 +1,13 @@
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
 function authenticateToken(req, res, next){
     // const authHeader = req.headers["authorization"];
     // const token = authHeader && authHeader.split(" ")[1];
 
-    const token = req.cookie.token;
+    const token = req.cookies?.token;
+
+    // console.log(token);
 
     if(!token){
         return res.status(401).json({

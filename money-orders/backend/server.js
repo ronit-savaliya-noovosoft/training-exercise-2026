@@ -12,7 +12,10 @@ const authenticateToken = require("./middleware");
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:8080",
+    credentials: true
+}));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
@@ -84,7 +87,9 @@ app.post("/api/auth/login", async (req, res)=> {
        res.cookie("token", token, {
            httpOnly: true,
            sameSite: "strict",
-           maxAge: 60*60*1000
+           secure: false,
+           maxAge: 60*60*1000,
+           path: "/"
        });
 
        res.json({
@@ -107,14 +112,28 @@ app.post("/api/auth/login", async (req, res)=> {
    }
 });
 
-app.get("/api/auth/me", async (req, res) => {
+app.get("/api/auth/me", authenticateToken, async (req, res) => {
     try{
-        const result = await db.query(
-            `SELECT name, email, password
-            FROM USERS
-            WHERE id = $1`,
-            [req.user.id]
-        );
+        let result;
+        if(req.user.role === 'customer'){
+            result = await db.query(
+                `SELECT u.name, u.email, a.id, a.balance, a.account_number, u.role
+                    FROM USERS u
+                    JOIN ACCOUNTS a
+                    ON a.cust_id = u.id
+                    WHERE u.id = $1`,
+                    [req.user.id]
+            );
+        }
+        else{
+            result = await db.query(
+                `SELECT u.name, u.email, u.role
+                    FROM USERS u
+                    WHERE u.id = $1`,
+                [req.user.id]
+            );
+        }
+
 
         res.json({
             message: "User fetched successfully",
@@ -139,7 +158,7 @@ app.post("/api/auth/signup", async (req, res) => {
 
         await client.query(
                         `INSERT INTO USERS (name, email, password, role)
-                        VALUES ($1, $2, $3, "customer")`, [name, email, passwordHash]);
+                        VALUES ($1, $2, $3, $4)`, [name, email, passwordHash, "customer"]);
 
         client.release();
 
@@ -167,42 +186,50 @@ app.post("/api/auth/logout", async (req, res) => {
     });
 });
 
-app.get("/api/transactions", async (req, res) => {
+app.get("/api/transactions", authenticateToken, async (req, res) => {
     try{
         const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-        const limit = Math.min(10, Math.max(1, parseInt(req.query.limit, 10) || 1));
+        // const limit = Math.min(10, Math.max(1, parseInt(req.query.limit, 10) || 1));
+        const limit = Math.max(10, parseInt(req.query.limit) || 1);
         const offset = (page-1) * limit;
 
         let filter, params;
         const { id, role } = req.user;
+
+        console.log("Checkpoint 1");
 
         if(role === 'manager'){
            filter = "t.created_by = $1";
            params = [id];
         }
         else{
-            filter = `(
-                from_user.id = $1 OR
-                to_user.id = $1
-            )`;
-            params = [id];
+            filter = "sender.id = $1 OR receiver.id = $1";
+            params = [Number(id)];
         }
 
+        console.log("Checkpoint 2");
+
         const count = await db.query(
-            `SELECT COUNT(*) AS total
-            FROM TRANSACTIONS t
-            LEFT JOIN ACCOUNTS to_account
-            ON t.to_account_id=to_account.id
-            LEFT JOIN ACCOUNTS from_account
-            ON t.from_account_id= from_account.id
-            WHERE ${filter}`,
+            `SELECT COUNT(*)
+             FROM TRANSACTIONS t
+                      LEFT JOIN ACCOUNTS fa
+                                ON t.from_account_id=fa.id
+                      LEFT JOIN USERS sender
+                                ON fa.cust_id=sender.id
+                      LEFT JOIN ACCOUNTS ta
+                                ON t.to_account_id=ta.id
+                      LEFT JOIN USERS receiver
+                                ON receiver.id=ta.cust_id
+             WHERE ${filter}`,
             params
         )
 
         const total = Number(count.rows[0].total);
 
+        console.log("Checkpoint 3");
+
         const result = await db.query(
-            `SELECT t.id, t.type, sender.name, fa.account_number, receiver.name, ta.account_number, t.amount, t.status, t.created_at
+            `SELECT t.id, t.type, sender.name as sender, fa.account_number as from_account_number, receiver.name as receiver, ta.account_number as to_account_number, t.amount, t.status, t.created_at
             FROM TRANSACTIONS t
             LEFT JOIN ACCOUNTS fa
             ON t.from_account_id=fa.id
@@ -219,7 +246,10 @@ app.get("/api/transactions", async (req, res) => {
             [...params, limit, offset]
         );
 
+        console.log("Checkpoint 4");
+
         res.json({
+            status: "success",
             transactions: result.rows,
             pagination: {
                 page,
@@ -243,7 +273,8 @@ app.get("/api/accounts/customers", async (req, res)=>{
             FROM USERS u
             JOIN ACCOUNTS a
             ON u.id = a.cust_id
-            WHERE role='customer'`
+            WHERE role='customer'
+            ORDER BY u.name`
         );
 
         res.json({
@@ -261,10 +292,15 @@ app.get("/api/accounts/customers", async (req, res)=>{
 
 app.post("/api/transactions/deposit", authenticateToken, async (req, res) => {
     const client = await db.connect();
-    try{
-        const { accountId, amount } = req.body;
+    const { accountId, amount } = req.body;
+    const depositAmount = Number(amount);
 
-        if(!accountId || !amount || amount<=0){
+    console.log(accountId);
+    console.log(amount);
+
+    try{
+
+        if(!accountId || !depositAmount || depositAmount<=0){
             return res.status(400).json({
                 message: "Invalid account or amount"
             });
@@ -274,17 +310,25 @@ app.post("/api/transactions/deposit", authenticateToken, async (req, res) => {
 
         await client.query("BEGIN");
 
-        await client.query(
+        const result = await client.query(
             `UPDATE ACCOUNTS 
             SET balance=balance+$1
             WHERE id = $2`,
-            [amount, accountId]
+            [depositAmount, accountId]
         );
+
+        if(result.rowCount === 0){
+            await client.query("ROLLBACK");
+
+            return res.status(404).json({
+               message: "Account not found"
+            });
+        }
 
         await client.query(
             `INSERT INTO TRANSACTIONS (type, to_account_id, amount, status, created_by)
-            VALUES ("deposit", $1, $2, "completed", $3)`,
-            [accountId, amount, req.user.id]
+            VALUES ($1, $2, $3, $4, $5)`,
+            ["deposit", accountId, depositAmount, "completed", req.user.id]
         );
 
         await client.query("COMMIT");
@@ -299,13 +343,15 @@ app.post("/api/transactions/deposit", authenticateToken, async (req, res) => {
         try{
             await client.query(
                 `INSERT INTO TRANSACTIONS (type, to_account_id, amount, status, created_by)
-                VALUES ("deposit", $1, $2, "failed", $3)`,
-                [accountId, amount, req.user.id]
+                 VALUES ($1, $2, $3, $4, $5)`,
+                ["deposit", accountId, depositAmount, "failed", req.user.id]
             );
         }
         catch (e){
             console.error(e);
         }
+
+        console.error(e);
 
         return res.status(500).json({
             message: "Deposit Failed"
@@ -316,11 +362,11 @@ app.post("/api/transactions/deposit", authenticateToken, async (req, res) => {
     }
 });
 
-app.post("/api/transactions/withdrawal", async (req, res) => {
-   const client = await db.connect();
-   try{
-       const { accountId, amount } = req.body;
+app.post("/api/transactions/withdrawal", authenticateToken, async (req, res) => {
+    const client = await db.connect();
+    const { accountId, amount } = req.body;
 
+    try{
        if(!accountId || !amount || amount<=0){
            return res.status(400).json({
                message: "Invalid account or amount"
@@ -334,14 +380,16 @@ app.post("/api/transactions/withdrawal", async (req, res) => {
             WHERE id=$1`, [accountId]
        );
 
-       if(result.rows[0].balance < amount){
+       console.log(result.rows[0].balance);
+
+       if(Number(result.rows[0].balance) < Number(amount)){
            await client.query("ROLLBACK");
 
            try{
                await client.query(
                    `INSERT INTO TRANSACTIONS (type, from_account_id, amount, status, created_by)
-                    VALUES ("withdraw", $1, $2, "failed", $3)`,
-                   [accountId, amount, req.user.id]
+                    VALUES ($1, $2, $3, $4, $5)`,
+                   ["withdraw", accountId, amount, "failed", req.user.id]
                );
            }
            catch (e){
@@ -362,8 +410,8 @@ app.post("/api/transactions/withdrawal", async (req, res) => {
 
        await client.query(
            `INSERT INTO TRANSACTIONS (type, from_account_id, amount, status, created_by)
-            VALUES ("withdraw", $1, $2, "completed", $3)`,
-           [accountId, amount, req.user.id]
+            VALUES ($1, $2, $3, $4, $5)`,
+           ["withdraw", accountId, amount, "completed", req.user.id]
        );
 
        await client.query("COMMIT");
@@ -378,8 +426,8 @@ app.post("/api/transactions/withdrawal", async (req, res) => {
        try{
            await client.query(
                `INSERT INTO TRANSACTIONS (type, from_account_id, amount, status, created_by)
-                VALUES ("withdraw", $1, $2, "failed", $3)`,
-               [accountId, amount, req.user.id]
+                VALUES ($1, $2, $3, $4, $5)`,
+               ["withdraw", accountId, amount, "failed", req.user.id]
            );
        }
        catch (e){
@@ -395,32 +443,41 @@ app.post("/api/transactions/withdrawal", async (req, res) => {
    }
 });
 
-app.post("/api/transactions/transfer", async (req, res) => {
-   const client = await db.connect();
-   try{
-       const { fromAccountId, toAccountId, amount } = req.body;
+app.post("/api/transactions/transfer", authenticateToken, async (req, res) => {
+    const client = await db.connect();
+    const { fromAccountId, toAccountId, amount } = req.body;
 
-       if(!fromAccountId || !toAccountId || !amount || amount<=0){
-           return res.status(400).json({
-               message: "Invalid account or amount"
-           });
-       }
+    if(!fromAccountId || !toAccountId || !amount || amount<=0){
+        return res.status(400).json({
+            message: "Invalid account or amount"
+        });
+    }
+
+    try{
+        console.log(fromAccountId);
+        console.log(toAccountId);
 
        await client.query("BEGIN");
+
+       console.log("Check point 0");
 
        const result = await client.query(
            `SELECT balance FROM ACCOUNTS
             WHERE id=$1`, [fromAccountId]
        );
 
-       if(result.rows[0].balance < amount){
+       console.log(typeof(result.rows[0].balance));
+       console.log(typeof(amount));
+       console.log((result.rows[0].balance) < amount);
+
+       if(Number(result.rows[0].balance) < Number(amount)){
            await client.query("ROLLBACK");
 
            try{
                await client.query(
                    `INSERT INTO TRANSACTIONS (type, from_account_id, to_account_id, amount, status, created_by)
-                    VALUES ("transfer", $1, $2, $3, "failed", $4)`,
-                   [fromAccountId, toAccountId, amount, req.user.id]
+                    VALUES ($1, $2, $3, $4, $5, $6)`,
+                   ["transfer", fromAccountId, toAccountId, amount, "failed", req.user.id]
                );
            }
            catch (e){
@@ -432,12 +489,16 @@ app.post("/api/transactions/transfer", async (req, res) => {
            })
        }
 
+       console.log("Check point 1");
+
        await client.query(
            `UPDATE ACCOUNTS 
             SET balance=balance-$1
             WHERE id = $2`,
            [amount, fromAccountId]
        );
+
+       console.log("Check point 2");
 
        await client.query(
            `UPDATE ACCOUNTS
@@ -446,13 +507,17 @@ app.post("/api/transactions/transfer", async (req, res) => {
            [amount, toAccountId]
        );
 
-       await client.query(
-           `INSERT INTO TRANSACTIONS (type, from_account_id, to_account_id, amount, status, created_by)
-            VALUES ("transfer", $1, $2, $3, "completed", $4)`,
-           [fromAccountId, toAccountId, amount, req.user.id]
-       );
+       console.log("Check point 3");
 
-       await client.query("COMMIT");
+        await client.query(
+           `INSERT INTO TRANSACTIONS (type, from_account_id, to_account_id, amount, status, created_by)
+            VALUES ($1, $2, $3, $4, $5, $6)`,
+           ["transfer", fromAccountId, toAccountId, amount, "completed", req.user.id]
+        );
+
+        console.log("Check point 4");
+
+        await client.query("COMMIT");
 
        res.json({
            message: "Transfer Successfully"
@@ -465,8 +530,8 @@ app.post("/api/transactions/transfer", async (req, res) => {
        try{
            await client.query(
                `INSERT INTO TRANSACTIONS (type, from_account_id, to_account_id, amount, status, created_by)
-                VALUES ("withdraw", $1, $2, $3, "failed", $4)`,
-               [fromAccountId, toAccountId, amount, req.user.id]
+                VALUES ($1, $2, $3, $4, $5, $6)`,
+               ["transfer", fromAccountId, toAccountId, amount, "failed", req.user.id]
            );
        }
        catch (e){
