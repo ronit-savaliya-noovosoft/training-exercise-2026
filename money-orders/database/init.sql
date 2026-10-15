@@ -35,13 +35,13 @@ WHERE role='customer';
 
 SELECT t.id, t.type, sender.name as sender, fa.account_number as from_account_number, receiver.name as receiver, ta.account_number as to_account_number, t.amount, t.status, t.created_at
 FROM TRANSACTIONS t
-         LEFT JOIN ACCOUNTS fa
+        JOIN ACCOUNTS fa
                    ON t.from_account_id=fa.id
-         LEFT JOIN USERS sender
+        JOIN USERS sender
                    ON fa.cust_id=sender.id
-         LEFT JOIN ACCOUNTS ta
+        JOIN ACCOUNTS ta
                    ON t.to_account_id=ta.id
-         LEFT JOIN USERS receiver
+        JOIN USERS receiver
                    ON receiver.id=ta.cust_id
 WHERE sender.id = 2 OR receiver.id = 2
 ORDER BY t.created_at DESC;

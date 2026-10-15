@@ -210,7 +210,7 @@ app.get("/api/transactions", authenticateToken, async (req, res) => {
         console.log("Checkpoint 2");
 
         const count = await db.query(
-            `SELECT COUNT(*)
+            `SELECT COUNT(*) AS total
              FROM TRANSACTIONS t
                       LEFT JOIN ACCOUNTS fa
                                 ON t.from_account_id=fa.id
@@ -294,13 +294,14 @@ app.post("/api/transactions/deposit", authenticateToken, async (req, res) => {
     const client = await db.connect();
     const { accountId, amount } = req.body;
     const depositAmount = Number(amount);
+    const depositAccountId = req.user.role === 'customer' ? req.user.id : accountId;
 
     console.log(accountId);
     console.log(amount);
 
     try{
 
-        if(!accountId || !depositAmount || depositAmount<=0){
+        if(!depositAccountId || !depositAmount || depositAmount<=0){
             return res.status(400).json({
                 message: "Invalid account or amount"
             });
@@ -314,7 +315,7 @@ app.post("/api/transactions/deposit", authenticateToken, async (req, res) => {
             `UPDATE ACCOUNTS 
             SET balance=balance+$1
             WHERE id = $2`,
-            [depositAmount, accountId]
+            [depositAmount, depositAccountId]
         );
 
         if(result.rowCount === 0){
@@ -328,7 +329,7 @@ app.post("/api/transactions/deposit", authenticateToken, async (req, res) => {
         await client.query(
             `INSERT INTO TRANSACTIONS (type, to_account_id, amount, status, created_by)
             VALUES ($1, $2, $3, $4, $5)`,
-            ["deposit", accountId, depositAmount, "completed", req.user.id]
+            ["deposit", depositAccountId, depositAmount, "completed", req.user.id]
         );
 
         await client.query("COMMIT");
@@ -344,7 +345,7 @@ app.post("/api/transactions/deposit", authenticateToken, async (req, res) => {
             await client.query(
                 `INSERT INTO TRANSACTIONS (type, to_account_id, amount, status, created_by)
                  VALUES ($1, $2, $3, $4, $5)`,
-                ["deposit", accountId, depositAmount, "failed", req.user.id]
+                ["deposit", depositAccountId, depositAmount, "failed", req.user.id]
             );
         }
         catch (e){
@@ -365,9 +366,11 @@ app.post("/api/transactions/deposit", authenticateToken, async (req, res) => {
 app.post("/api/transactions/withdrawal", authenticateToken, async (req, res) => {
     const client = await db.connect();
     const { accountId, amount } = req.body;
+    const withdrawAmount = Number(amount);
+    const withdrawAccountId = req.user.role === 'customer' ? req.user.id : accountId;
 
     try{
-       if(!accountId || !amount || amount<=0){
+       if(!withdrawAccountId || !withdrawAmount || withdrawAmount<=0){
            return res.status(400).json({
                message: "Invalid account or amount"
            });
@@ -377,7 +380,7 @@ app.post("/api/transactions/withdrawal", authenticateToken, async (req, res) => 
 
        const result = await client.query(
            `SELECT balance FROM ACCOUNTS
-            WHERE id=$1`, [accountId]
+            WHERE id=$1`, [withdrawAccountId]
        );
 
        console.log(result.rows[0].balance);
@@ -389,7 +392,7 @@ app.post("/api/transactions/withdrawal", authenticateToken, async (req, res) => 
                await client.query(
                    `INSERT INTO TRANSACTIONS (type, from_account_id, amount, status, created_by)
                     VALUES ($1, $2, $3, $4, $5)`,
-                   ["withdraw", accountId, amount, "failed", req.user.id]
+                   ["withdraw", withdrawAccountId, withdrawAmount, "failed", req.user.id]
                );
            }
            catch (e){
@@ -405,13 +408,13 @@ app.post("/api/transactions/withdrawal", authenticateToken, async (req, res) => 
            `UPDATE ACCOUNTS 
             SET balance=balance-$1
             WHERE id = $2`,
-           [amount, accountId]
+           [withdrawAmount, withdrawAccountId]
        );
 
        await client.query(
            `INSERT INTO TRANSACTIONS (type, from_account_id, amount, status, created_by)
             VALUES ($1, $2, $3, $4, $5)`,
-           ["withdraw", accountId, amount, "completed", req.user.id]
+           ["withdraw", withdrawAccountId, withdrawAmount, "completed", req.user.id]
        );
 
        await client.query("COMMIT");
@@ -427,7 +430,7 @@ app.post("/api/transactions/withdrawal", authenticateToken, async (req, res) => 
            await client.query(
                `INSERT INTO TRANSACTIONS (type, from_account_id, amount, status, created_by)
                 VALUES ($1, $2, $3, $4, $5)`,
-               ["withdraw", accountId, amount, "failed", req.user.id]
+               ["withdraw", withdrawAccountId, withdrawAmount, "failed", req.user.id]
            );
        }
        catch (e){
@@ -446,8 +449,10 @@ app.post("/api/transactions/withdrawal", authenticateToken, async (req, res) => 
 app.post("/api/transactions/transfer", authenticateToken, async (req, res) => {
     const client = await db.connect();
     const { fromAccountId, toAccountId, amount } = req.body;
+    const tranferAmount = Number(amount);
+    const tranferFromAccountId = req.user.role==='customer'?req.user.id:fromAccountId;
 
-    if(!fromAccountId || !toAccountId || !amount || amount<=0){
+    if(!tranferFromAccountId || !toAccountId || !tranferAmount || tranferAmount<=0){
         return res.status(400).json({
             message: "Invalid account or amount"
         });
@@ -463,7 +468,7 @@ app.post("/api/transactions/transfer", authenticateToken, async (req, res) => {
 
        const result = await client.query(
            `SELECT balance FROM ACCOUNTS
-            WHERE id=$1`, [fromAccountId]
+            WHERE id=$1`, [tranferFromAccountId]
        );
 
        console.log(typeof(result.rows[0].balance));
@@ -477,7 +482,7 @@ app.post("/api/transactions/transfer", authenticateToken, async (req, res) => {
                await client.query(
                    `INSERT INTO TRANSACTIONS (type, from_account_id, to_account_id, amount, status, created_by)
                     VALUES ($1, $2, $3, $4, $5, $6)`,
-                   ["transfer", fromAccountId, toAccountId, amount, "failed", req.user.id]
+                   ["transfer", tranferFromAccountId, toAccountId, tranferAmount, "failed", req.user.id]
                );
            }
            catch (e){
@@ -495,7 +500,7 @@ app.post("/api/transactions/transfer", authenticateToken, async (req, res) => {
            `UPDATE ACCOUNTS 
             SET balance=balance-$1
             WHERE id = $2`,
-           [amount, fromAccountId]
+           [tranferAmount, tranferFromAccountId]
        );
 
        console.log("Check point 2");
@@ -504,7 +509,7 @@ app.post("/api/transactions/transfer", authenticateToken, async (req, res) => {
            `UPDATE ACCOUNTS
             SET balance=balance+$1
             WHERE id = $2`,
-           [amount, toAccountId]
+           [tranferAmount, toAccountId]
        );
 
        console.log("Check point 3");
@@ -512,7 +517,7 @@ app.post("/api/transactions/transfer", authenticateToken, async (req, res) => {
         await client.query(
            `INSERT INTO TRANSACTIONS (type, from_account_id, to_account_id, amount, status, created_by)
             VALUES ($1, $2, $3, $4, $5, $6)`,
-           ["transfer", fromAccountId, toAccountId, amount, "completed", req.user.id]
+           ["transfer", tranferFromAccountId, toAccountId, tranferAmount, "completed", req.user.id]
         );
 
         console.log("Check point 4");
@@ -531,7 +536,7 @@ app.post("/api/transactions/transfer", authenticateToken, async (req, res) => {
            await client.query(
                `INSERT INTO TRANSACTIONS (type, from_account_id, to_account_id, amount, status, created_by)
                 VALUES ($1, $2, $3, $4, $5, $6)`,
-               ["transfer", fromAccountId, toAccountId, amount, "failed", req.user.id]
+               ["transfer", tranferFromAccountId, toAccountId, tranferAmount, "failed", req.user.id]
            );
        }
        catch (e){

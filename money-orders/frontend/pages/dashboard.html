@@ -129,25 +129,9 @@
                             </thead>
                             <tbody id="transactions">
                                 <tr>
-                                    <td>Deposit</td>
-                                    <td>-</td>
-                                    <td>Person 2</td>
-                                    <td class="text-success">1000</td>
-                                    <td class="text-success">Completed</td>
-                                </tr>
-                                <tr>
-                                    <td>Withdraw</td>
-                                    <td>Person 1</td>
-                                    <td>-</td>
-                                    <td class="text-danger">600</td>
-                                    <td class="text-success">Completed</td>
-                                </tr>
-                                <tr>
-                                    <td>Transfer</td>
-                                    <td>Person 1</td>
-                                    <td>Person 2</td>
-                                    <td class="text-warning">500</td>
-                                    <td class="text-success">Completed</td>
+                                    <td colspan="5" class="text-center">
+                                        Loading transactions...
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -155,23 +139,14 @@
                 </div>
             </div>
 
-            <nav aria-label="Page navigation example">
-                <ul class="pagination">
-                    <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+            <div class="d-flex justify-content-center align-items-center flex-wrap gap-3 mt-3">
+                <small id="paginationInfo" class="text-muted">
+                    Loading...
+                </small>
+                <nav aria-label="Transaction pagination">
+                    <ul class="pagination mb-0" id="pagination"></ul>
+                </nav>
+            </div>
         </main>
         <footer>
             <button class="btn btn-danger" id="logout">Log Out</button>
