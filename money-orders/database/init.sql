@@ -52,13 +52,17 @@ JOIN ACCOUNTS a
 ON a.cust_id = u.id
 WHERE u.id = 1;
 
+SELECT a.id
+FROM ACCOUNTS a
+WHERE cust_id=2;
+
 SELECT * FROM TRANSACTIONS;
 SELECT * FROM ACCOUNTS;
 SELECT * FROM USERS;
 
+DELETE FROM USERS
+WHERE id=6;
+
 SELECT CURRENT_TIMESTAMP;
 
 SELECT current_database() AS database;
-DROP TABLE transactions;
-DROP TABLE accounts;
-DROP TABLE users;

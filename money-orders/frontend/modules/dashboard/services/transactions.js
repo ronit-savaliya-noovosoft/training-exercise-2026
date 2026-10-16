@@ -1,62 +1,42 @@
-const API_URL = "http://localhost:5000/api";
-
-// Display User Information
-const user_name = document.getElementById('user_name');
-const user_email = document.getElementById('user_email');
-const user_role = document.getElementById('user_role');
-const avatar = document.getElementById('avatar');
-const user_account = document.getElementById('user_account');
-const account_balance = document.getElementById('account_balance');
-
-// Get Me
-async function fetchMe(e){
-    e.preventDefault();
-
-    const response = await fetch(`${API_URL}/auth/me`, {
-        method: "GET",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-    });
-
-    const result = await response.json();
-
-    const hour = new Date().getHours();
-
-    if (hour < 12) {
-        user_name.innerText = "Good Morning! " + result.user.name;
-    } else if (hour < 17) {
-        user_name.innerText = "Good Afternoon! " + result.user.name;
-    } else if (hour < 21) {
-        user_name.innerText = "Good Evening! " + result.user.name;
-    }
-
-    console.log(result);
-
-    user_email.innerText = result.user.email;
-    user_role.innerText = result.user.role;
-    user_account.innerText = result.user.account_number===undefined ? "Logged in as Manager" :result.user.account_number;
-    account_balance.innerText = result.user.balance===undefined ? "0.00" :result.user.balance;
-
-    let parts = result.user.name.split(" ");
-
-    avatar.innerText = parts[0][0]+parts[1][0];
-}
-
-window.addEventListener('DOMContentLoaded', fetchMe);
+import { BASE_URL, ACCOUNT, TRANSACTION } from "../../../config.js";
+import { user_data } from "./information.js";
 
 // Dropdowns
 const dropdowns = document.querySelectorAll('#select-deposit-to, #select-withdraw-from, #select-transfer-to, #select-transfer-from');
-async function fetchAndDisplayData() {
+console.log(dropdowns);
+async function fetchAndDisplayData(e) {
+    e.preventDefault();
+
     try {
-        const response = await fetch(`${API_URL}/accounts/customers`);
+        const response = await fetch(`${BASE_URL}${ACCOUNT}/customers`,{
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+        });
         const result = await response.json();
 
-        console.log(result);
-        dropdowns.forEach((dropdown)=>{
-            dropdown.innerHTML = result.accounts.map(item => `
+        const array = result.accounts.filter(a => a.account_id!==user_data.account_id);
+
+        console.log(array);
+
+        if(user_data.role === 'customer'){
+            for(let i=0; i<=2; i++){
+                dropdowns[i].innerHTML =`
+                    <option value="${user_data.account_id}">${user_data.name} (${user_data.account_number})</option>
+                `;
+            }
+            dropdowns[3].innerHTML = array.map(item => `
                 <option value="${item.account_id}">${item.name} (${item.account_number})</option>
             `).join('');
-        });
+        }
+        else if(user_data.role==='manager') {
+            dropdowns.forEach((dropdown)=>{
+                dropdown.innerHTML = result.accounts.map(item => `
+                <option value="${item.account_id}">${item.name} (${item.account_number})</option>
+            `).join('');
+            });
+        }
+
 
     } catch (err) {
         console.log(err);
@@ -66,42 +46,15 @@ async function fetchAndDisplayData() {
 // Transactions
 const deposit = document.getElementById('deposit');
 deposit.addEventListener('click', async function deposit(e){
-   e.preventDefault();
-
-   const amount = document.getElementById('deposit-amount').value;
-   const accountId = document.getElementById('select-deposit-to').value;
-
-   console.log(accountId);
-
-   try{
-       const response = await fetch(`${API_URL}/transactions/deposit`, {
-           method: "POST",
-           credentials: "include",
-           headers: { "Content-Type": "application/json" },
-           body: JSON.stringify({ accountId, amount }),
-       });
-
-       const data = await response.json();
-
-       fetchTransactionHistory();
-
-       console.log(data);
-   } catch (error){
-       console.log("Error:", error);
-   }
-});
-
-const withdraw = document.getElementById('withdraw');
-withdraw.addEventListener('click', async function withdraw(e){
     e.preventDefault();
 
-    const amount = document.getElementById('withdraw-amount').value;
-    const accountId = document.getElementById('select-withdraw-from').value;
+    const amount = document.getElementById('deposit-amount').value;
+    const accountId = document.getElementById('select-deposit-to').value;
 
     console.log(accountId);
 
     try{
-        const response = await fetch(`${API_URL}/transactions/withdrawal`, {
+        const response = await fetch(`${BASE_URL}${TRANSACTION}/deposit`, {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
@@ -118,6 +71,35 @@ withdraw.addEventListener('click', async function withdraw(e){
     }
 });
 
+const withdraw = document.getElementById('withdraw');
+withdraw.addEventListener('click', async function withdraw(e){
+    e.preventDefault();
+
+    const amount = document.getElementById('withdraw-amount').value;
+    const accountId = document.getElementById('select-withdraw-from').value;
+
+    console.log(accountId);
+
+    try{
+        const response = await fetch(`${BASE_URL}${TRANSACTION}/withdrawal`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ accountId, amount }),
+        });
+
+        const data = await response.json();
+
+        fetchTransactionHistory();
+
+        console.log(data);
+    } catch (error){
+        console.log("Error:", error);
+    }
+
+    amount.innerText = "";
+});
+
 const transfer = document.getElementById('transfer');
 transfer.addEventListener('click', async function transfer(e){
     e.preventDefault();
@@ -130,7 +112,7 @@ transfer.addEventListener('click', async function transfer(e){
     console.log(toAccountId);
 
     try{
-        const response = await fetch(`${API_URL}/transactions/transfer`, {
+        const response = await fetch(`${BASE_URL}${TRANSACTION}/transfer`, {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
@@ -145,6 +127,8 @@ transfer.addEventListener('click', async function transfer(e){
     } catch (error){
         console.log("Error:", error);
     }
+
+    amount.innerText = "";
 });
 
 window.addEventListener('DOMContentLoaded', fetchAndDisplayData);
@@ -162,7 +146,7 @@ async function fetchTransactionHistory(page = 1){
     try {
         pagination.innerHTML = '';
 
-        const response = await fetch(`${API_URL}/transactions?page=${page}&limit=${limit}`,{
+        const response = await fetch(`${BASE_URL}${TRANSACTION}?page=${page}&limit=${limit}`,{
             method: "GET",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
@@ -245,7 +229,7 @@ function addPageButton(label, page, disabled = false, active = false){
     button.disabled = disabled;
 
     button.addEventListener("click", () => {
-       fetchTransactionHistory(page);
+        fetchTransactionHistory(page);
     });
 
     li.appendChild(button);
@@ -253,18 +237,3 @@ function addPageButton(label, page, disabled = false, active = false){
 }
 
 window.addEventListener('DOMContentLoaded', () => fetchTransactionHistory(1));
-
-// Log Out
-const logout = document.getElementById('logout');
-logout.addEventListener('click', async function logout(e){
-    e.preventDefault();
-
-    try {
-        await fetch(`${API_URL}/auth/logout`, { method: "POST" });
-        localStorage.clear();
-        alert("Logged out!");
-        window.location.href = '../index.html';
-    } catch (error) {
-        console.error("Error:", error);
-    }
-});
