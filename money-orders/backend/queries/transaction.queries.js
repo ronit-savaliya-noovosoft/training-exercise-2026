@@ -18,7 +18,7 @@ const TRANSACTION_JOINS = `
               ON receiver.id=ta.cust_id
 `;
 
-const COUNT_TRANSACTIONS_PREFIX = `SELECT COUNT(*) AS total ${TRANSACTION_JOINS} WHERE `;
+// const COUNT_TRANSACTIONS_PREFIX = `SELECT COUNT(*) AS total ${TRANSACTION_JOINS} WHERE `;
 
 const GET_TRANSACTION_HISTORY_PREFIX = `
     SELECT 
@@ -30,14 +30,16 @@ const GET_TRANSACTION_HISTORY_PREFIX = `
         ta.account_number as to_account_number, 
         t.amount, 
         t.status, 
-        t.created_at
+        t.created_at,
+        COUNT(*) OVER() AS total_count
     ${TRANSACTION_JOINS}
     WHERE
 `;
 
 const GET_TRANSACTIONS_FOR_EMAIL = `
     ${GET_TRANSACTION_HISTORY_PREFIX}
-        ($2::text IS NULL OR LOWER(t.type) = LOWER($2))
+        (sender.id=$1 OR receiver.id=$1)
+    AND ($2::text IS NULL OR LOWER(t.type) = LOWER($2))
     AND ($3::date IS NULL OR t.created_at >= $3::date)
     AND ($4::date IS NULL OR t.created_at <= $4::date)
     ORDER BY t.created_at DESC 
@@ -46,7 +48,7 @@ const GET_TRANSACTIONS_FOR_EMAIL = `
 
 module.exports = {
     INSERT_TRANSACTION,
-    COUNT_TRANSACTIONS_PREFIX,
+    // COUNT_TRANSACTIONS_PREFIX,
     GET_TRANSACTION_HISTORY_PREFIX,
     GET_TRANSACTIONS_FOR_EMAIL
 }

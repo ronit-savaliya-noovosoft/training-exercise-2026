@@ -29,6 +29,7 @@ async function login(req, res){
         });
 
         return res.json({
+            status: "success",
             message: "Login successful",
             token: result.token ,
             user: result.user

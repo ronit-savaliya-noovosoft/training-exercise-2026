@@ -32,10 +32,10 @@ function getVisibilityFilter(user){
 async function getTransactionHistory(user, { limit, offset }){
     const filter = getVisibilityFilter(user);
 
-    const countResult = await db.query(
-        `${queries.COUNT_TRANSACTIONS_PREFIX}${filter.sql}`,
-        filter.params
-    );
+    // const countResult = await db.query(
+    //     `${queries.COUNT_TRANSACTIONS_PREFIX}${filter.sql}`,
+    //     filter.params
+    // );
 
     const result = await db.query(
         `${queries.GET_TRANSACTION_HISTORY_PREFIX}${filter.sql}
@@ -44,9 +44,17 @@ async function getTransactionHistory(user, { limit, offset }){
         [...filter.params, limit, offset]
     );
 
+    if(result.rows.length === 0){
+        return {
+            status: "success",
+            message: "No Transaction Found",
+            transactions: result.rows
+        }
+    }
+
     return {
         transactions: result.rows,
-        total: Number(countResult.rows[0].total)
+        total: Number(result.rows[0].total_count)
     }
 }
 

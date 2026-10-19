@@ -96,7 +96,7 @@ async function deposit({ accountId, amount, createdBy }){
 
         await client.query("COMMIT");
 
-        return { message: "Deposit Successfully" };
+        return { status: "success", message: "Deposit Successfully" };
     }
     catch (e){
         if(transactionStarted){
@@ -105,7 +105,7 @@ async function deposit({ accountId, amount, createdBy }){
 
         await recordFailedTransaction(transaction);
 
-        return { message: "Deposit Failed" };
+        return { status: "failed", message: "Deposit Failed" };
     }
     finally {
         client.release();
@@ -149,7 +149,7 @@ async function withdrawal({ accountId, amount, createdBy }){
 
         await client.query("COMMIT");
 
-        return { message: "Withdrawal Successfully" };
+        return { status: "success", message: "Withdrawal Successfully" };
     }
     catch (e){
         if(transactionStarted){
@@ -158,7 +158,7 @@ async function withdrawal({ accountId, amount, createdBy }){
 
         await recordFailedTransaction(transaction);
 
-        return { message: "Withdrawal Failed" };
+        return { status: "failed", message: "Withdrawal Failed" };
     }
     finally {
         client.release();
@@ -213,7 +213,7 @@ async function transfer({ fromAccountId, toAccountId, amount, createdBy }){
 
         await client.query("COMMIT");
 
-        return { message: "Transfer Successfully" };
+        return { status: "success", message: "Transfer Successfully" };
     }
     catch (e){
         if(transactionStarted){
@@ -222,7 +222,7 @@ async function transfer({ fromAccountId, toAccountId, amount, createdBy }){
 
         await recordFailedTransaction(transaction);
 
-        return { message: "Transfer Failed" };
+        return { status: "failed", message: "Transfer Failed" };
     }
     finally {
         client.release();
@@ -232,7 +232,7 @@ async function transfer({ fromAccountId, toAccountId, amount, createdBy }){
 async function emailTransactionHistory(user, filters){
     const { limit=10, type, fromDate, toDate } = filters;
 
-    const allowedTypes = ["deposit", "withdrawal", "transfer"];
+    const allowedTypes = ["deposit", "withdraw", "transfer"];
 
     if(type && type!=="all" && !allowedTypes.includes(type.toLowerCase())){
         console.error("Invalid transaction type");
@@ -270,8 +270,8 @@ async function emailTransactionHistory(user, filters){
         subject: "Your Transaction History",
         html: `
             <h2>Your Transaction History</h2>
-            <p>Hello ${user.name}</p>
-            <p>Here are you latest transactions matching your selected filter</p>
+            <p>Hello! ${user.name},</p>
+            <p>Here are you latest transactions matching your selected filter.</p>
             <table>
                 <thead>
                     <tr>
@@ -292,6 +292,7 @@ async function emailTransactionHistory(user, filters){
     });
 
     return {
+        status: "success",
         message: "Transaction History sent successfully",
         recordSent: transactions.length
     }

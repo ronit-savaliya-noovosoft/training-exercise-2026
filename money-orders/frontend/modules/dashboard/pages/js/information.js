@@ -1,4 +1,7 @@
-import { BASE_URL, AUTH } from "../../../config.js";
+import { BASE_URL, AUTH } from "../../../../config.js";
+import {getMyself} from "../../services/informationService.js";
+import {logOut} from "../../../auth/services/loginService.js";
+import {fetchAndDisplayData} from "./transactions.js";
 
 // Display User Information
 export let user_data = null;
@@ -13,13 +16,14 @@ const account_balance = document.getElementById('account_balance');
 async function fetchMe(e){
     e.preventDefault();
 
-    const response = await fetch(`${BASE_URL}${AUTH}/me`, {
-        method: "GET",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-    });
+    // const response = await fetch(`${BASE_URL}${AUTH}/me`, {
+    //     method: "GET",
+    //     credentials: "include",
+    //     headers: { "Content-Type": "application/json" },
+    // });
 
-    const result = await response.json();
+    const result = await getMyself();
+    console.log(result);
 
     const hour = new Date().getHours();
 
@@ -45,7 +49,10 @@ async function fetchMe(e){
     user_data = result.user;
 }
 
-window.addEventListener('DOMContentLoaded', fetchMe);
+window.addEventListener('DOMContentLoaded', (e) => {
+    fetchMe(e);
+    fetchAndDisplayData(e);
+});
 
 // Log Out
 const logout = document.getElementById('logout');
@@ -53,10 +60,11 @@ logout.addEventListener('click', async function logout(e){
     e.preventDefault();
 
     try {
-        await fetch(`${API_URL}${AUTH}/logout`, { method: "POST" });
+        // await fetch(`${BASE_URL}${AUTH}/logout`, { method: "POST" });
+        await logOut();
         localStorage.clear();
         alert("Logged out!");
-        window.location.href = '../../auth/pages/login.html';
+        window.location.href = '../../../auth/pages/html/login.html';
     } catch (error) {
         console.error("Error:", error);
     }

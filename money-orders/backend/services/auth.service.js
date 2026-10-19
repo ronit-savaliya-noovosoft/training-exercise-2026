@@ -23,13 +23,14 @@ async function login(email, password){
     );
 
     return {
-      token,
-      user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role
-      }
+        message: "Logged in successfully",
+        token,
+        user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+        }
     };
 }
 
@@ -49,6 +50,7 @@ async function signup(name, email, password){
     await authRepository.createAccount(accountNumber, customerId, 0);
 
     return {
+        status: "success",
         message: "Customer Sign Up successfully"
     };
 }

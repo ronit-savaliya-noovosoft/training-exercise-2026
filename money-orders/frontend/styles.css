@@ -55,6 +55,10 @@ nav{
     font-size: 1.5rem;
 }
 
+.hidden{
+    display: none;
+}
+
 @media (min-width: 768px) {
     header{
         flex-direction: row;
