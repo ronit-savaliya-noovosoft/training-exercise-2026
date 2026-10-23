@@ -1,16 +1,25 @@
 export async function apiRequest(url, method = "GET", body = null){
-    const response = await fetch(url, {
-        method,
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        ...(body && {body: JSON.stringify(body)})
-    });
+    try{
+        const response = await fetch(url, {
+            method,
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            ...(body && {body: JSON.stringify(body)})
+        });
 
-    const data = response.json();
+        const data = await response.json();
 
-    if(!response.ok){
-        throw new Error(data.message || "Something went wrong");
+        if(response.status === 401){
+            window.location.href = '../../../error/pages/html/unauthorize.html';
+        }
+
+        if(!response.ok){
+            throw new Error(data.message || "Something went wrong");
+        }
+
+        return data;
     }
-
-    return data;
+    catch (e){
+        console.log(e.message);
+    }
 }
