@@ -24,7 +24,7 @@ async function login(req, res){
             httpOnly: true,
             sameSite: "strict",
             secure: false,
-            maxAge: 60*60*1000,
+            maxAge: 24*60*60*1000,
             path: "/"
         });
 
@@ -82,7 +82,7 @@ async function signup(req, res){
     }
     catch (e){
         return res.status(500).json({
-            message: "Server Error"
+            message: "Account already exists!"
         });
     }
 }

@@ -1,5 +1,6 @@
 const db = require("../config/db");
 const queries = require("../queries/transaction.queries");
+const accountQueries = require("../queries/account.queries");
 
 async function createTransactions(client, transaction){
     const {
@@ -67,4 +68,19 @@ async function getTransactionsForEmail(customerId, type, fromDate, toDate, limit
     return result.rows;
 }
 
-module.exports = { createTransactions, getTransactionHistory, getTransactionsForEmail };
+async function getAccountByCustomerId(custId){
+    const result = await db.query(
+        accountQueries.GET_ACCOUNT_BY_CUSTOMER_ID,
+        [custId]
+    );
+
+    console.log(result.rows[0]);
+    return result.rows[0].id;
+}
+
+module.exports = {
+    createTransactions,
+    getTransactionHistory,
+    getTransactionsForEmail,
+    getAccountByCustomerId
+};

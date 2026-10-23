@@ -18,8 +18,6 @@ const TRANSACTION_JOINS = `
               ON receiver.id=ta.cust_id
 `;
 
-// const COUNT_TRANSACTIONS_PREFIX = `SELECT COUNT(*) AS total ${TRANSACTION_JOINS} WHERE `;
-
 const GET_TRANSACTION_HISTORY_PREFIX = `
     SELECT 
         t.id,
@@ -48,7 +46,6 @@ const GET_TRANSACTIONS_FOR_EMAIL = `
 
 module.exports = {
     INSERT_TRANSACTION,
-    // COUNT_TRANSACTIONS_PREFIX,
     GET_TRANSACTION_HISTORY_PREFIX,
     GET_TRANSACTIONS_FOR_EMAIL
 }

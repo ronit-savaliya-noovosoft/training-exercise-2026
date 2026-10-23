@@ -16,4 +16,21 @@ async function getCustomerAccounts(req, res){
     }
 }
 
-module.exports = { getCustomerAccounts };
+async function getAccountBalance(req, res){
+    try{
+        const result = await accountService.getAccountBalance(req.user.id, req.body.password);
+        console.log(result);
+
+        return res.json({
+            message: "Balance fetched successfully",
+            balance: result.balance
+        });
+    }
+    catch (e){
+        return res.status(500).json({
+            message: "Server Error"
+        });
+    }
+}
+
+module.exports = { getCustomerAccounts, getAccountBalance };

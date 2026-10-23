@@ -25,4 +25,18 @@ const GET_CUSTOMER_ACCOUNTS = `
     ORDER BY u.name
 `;
 
-module.exports = { UPDATE_BALANCE, GET_ACCOUNT_FOR_UPDATE, CREATE_ACCOUNT, GET_CUSTOMER_ACCOUNTS };
+const GET_ACCOUNT_BY_CUSTOMER_ID = `
+    SELECT a.id
+    FROM ACCOUNTS a
+    WHERE cust_id=$1
+`;
+
+const GET_ACCOUNT_BALANCE = `
+    SELECT a.id, a.balance, u.password
+    FROM accounts a
+    JOIN users u 
+    ON u.id=a.cust_id
+    WHERE cust_id=$1
+`;
+
+module.exports = { UPDATE_BALANCE, GET_ACCOUNT_FOR_UPDATE, CREATE_ACCOUNT, GET_CUSTOMER_ACCOUNTS, GET_ACCOUNT_BY_CUSTOMER_ID, GET_ACCOUNT_BALANCE };

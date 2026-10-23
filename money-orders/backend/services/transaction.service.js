@@ -67,6 +67,14 @@ async function getHistory(user, query){
     }
 }
 
+async function getAccount(user){
+    if(user.role === 'manager'){
+        return null;
+    }
+
+    return await transactionRepository.getAccountByCustomerId(user.id);
+}
+
 async function deposit({ accountId, amount, createdBy }){
     const id = validateAccountId(accountId);
     const value = validateAmount(amount);
@@ -81,30 +89,19 @@ async function deposit({ accountId, amount, createdBy }){
         createdBy
     }
 
-    let transactionStarted = false;
-
     try{
-        await client.query("BEGIN");
-        transactionStarted = true;
-
-        await accountRepository.updateBalance(client, id, value);
 
         await transactionRepository.createTransactions(client, {
             ...transaction,
-            status: TRANSACTION_STATUS.COMPLETED
+            status: TRANSACTION_STATUS.PENDING
         });
 
-        await client.query("COMMIT");
 
         return { status: "success", message: "Deposit Successfully" };
     }
     catch (e){
-        if(transactionStarted){
-            await client.query("ROLLBACK");
-        }
 
         await recordFailedTransaction(transaction);
-
         return { status: "failed", message: "Deposit Failed" };
     }
     finally {
@@ -126,36 +123,16 @@ async function withdrawal({ accountId, amount, createdBy }){
         createdBy
     }
 
-    let transactionStarted = false;
 
     try{
-        await client.query("BEGIN");
-        transactionStarted = true;
-
-        const account = await accountRepository.getAccountForUpdate(client, id);
-
-        console.log(account);
-
-        if(Number(account.balance)<value){
-            throw createError("Insufficient balance", 400, "INSUFFICIENT_BALANCE");
-        }
-
-        await accountRepository.updateBalance(client, id, -value);
-
         await transactionRepository.createTransactions(client,{
             ...transaction,
-            status: TRANSACTION_STATUS.COMPLETED
+            status: TRANSACTION_STATUS.PENDING
         }) ;
-
-        await client.query("COMMIT");
 
         return { status: "success", message: "Withdrawal Successfully" };
     }
     catch (e){
-        if(transactionStarted){
-            await client.query("ROLLBACK");
-        }
-
         await recordFailedTransaction(transaction);
 
         return { status: "failed", message: "Withdrawal Failed" };
@@ -183,43 +160,17 @@ async function transfer({ fromAccountId, toAccountId, amount, createdBy }){
         createdBy
     };
 
-    let transactionStarted = false;
 
     try{
-        await client.query("BEGIN");
-        transactionStarted = true;
-
-        const ids = [fromId, toId];
-        const accounts = {};
-
-        for(const id of ids){
-            accounts[id] = await accountRepository.getAccountForUpdate(client, id);
-
-            if(!accounts[id]){
-                console.log("Account not found");
-            }
-        }
-
-        if (Number(accounts[fromId].balance)<value){
-            throw createError("Insufficient balance", 400, "INSUFFICIENT_BALANCE");
-        }
-
-        await accountRepository.updateBalance(client, fromId, -value);
-        await accountRepository.updateBalance(client, toId, value);
         await transactionRepository.createTransactions(client, {
             ...transaction,
-            status: TRANSACTION_STATUS.COMPLETED
+            status: TRANSACTION_STATUS.PENDING
         });
 
-        await client.query("COMMIT");
 
         return { status: "success", message: "Transfer Successfully" };
     }
     catch (e){
-        if(transactionStarted){
-            await client.query("ROLLBACK");
-        }
-
         await recordFailedTransaction(transaction);
 
         return { status: "failed", message: "Transfer Failed" };
@@ -247,10 +198,6 @@ async function emailTransactionHistory(user, filters){
         limit
     );
 
-    if(!transactions.length){
-        console.error("No Transaction found for selected filter");
-    }
-
     const rows = transactions.map((transaction)=>
     `
         <tr>
@@ -264,11 +211,13 @@ async function emailTransactionHistory(user, filters){
     `
     ).join("");
 
-    await transporter.sendMail({
-        from: '"Banking App" <banking-app@localhost',
-        to: user.email,
-        subject: "Your Transaction History",
-        html: `
+    let html;
+    if (transactions.length === 0){
+        html = `<h3>No Transaction found for selected filter</h3>`;
+        console.error("No Transaction found for selected filter");
+    }
+    else {
+        html = `
             <h2>Your Transaction History</h2>
             <p>Hello! ${user.name},</p>
             <p>Here are you latest transactions matching your selected filter.</p>
@@ -288,7 +237,14 @@ async function emailTransactionHistory(user, filters){
                 </tbody>
             </table>
             <p>Records included: ${transactions.length}</p>
-        `
+        `;
+    }
+
+    await transporter.sendMail({
+        from: '"Banking App" <banking-app@localhost>',
+        to: user.email,
+        subject: "Your Transaction History",
+        html: html
     });
 
     return {
@@ -298,4 +254,11 @@ async function emailTransactionHistory(user, filters){
     }
 }
 
-module.exports = { getHistory, deposit, withdrawal, transfer, emailTransactionHistory };
+module.exports = {
+    getHistory,
+    getAccount,
+    deposit,
+    withdrawal,
+    transfer,
+    emailTransactionHistory
+};

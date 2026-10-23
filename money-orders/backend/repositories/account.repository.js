@@ -25,4 +25,10 @@ async function getCustomerAccounts(){
     return result.rows;
 }
 
-module.exports = { updateBalance, getAccountForUpdate, getCustomerAccounts };
+async function getAccountBalance(custId){
+    const result = await db.query(queries.GET_ACCOUNT_BALANCE, [custId]);
+
+    return result.rows[0] || null;
+}
+
+module.exports = { updateBalance, getAccountForUpdate, getCustomerAccounts, getAccountBalance };

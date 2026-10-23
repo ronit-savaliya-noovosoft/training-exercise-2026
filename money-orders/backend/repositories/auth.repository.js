@@ -45,4 +45,10 @@ async function createAccount(account_number, cust_id, balance){
     );
 }
 
-module.exports = { getCustomerProfile, getUserProfile, createCustomer, createAccount, findUserByEmail };
+module.exports = {
+    getCustomerProfile,
+    getUserProfile,
+    createCustomer,
+    createAccount,
+    findUserByEmail
+};

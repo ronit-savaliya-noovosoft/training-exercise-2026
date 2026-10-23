@@ -19,9 +19,17 @@ async function getHistory(req, res){
 }
 
 async function deposit(req, res){
+    var accountId;
+    if(req.user.role==='customer'){
+        accountId = await transactionService.getAccount(req.user);
+    }
+    else{
+        accountId = req.body.accountId;
+    }
+
     try{
         return res.json(await transactionService.deposit({
-            accountId: req.body.accountId,
+            accountId: accountId,
             amount: req.body.amount,
             createdBy: req.user.id
         }))
@@ -32,9 +40,17 @@ async function deposit(req, res){
 }
 
 async function withdrawal(req, res){
+    var accountId;
+    if(req.user.role==='customer'){
+        accountId = await transactionService.getAccount(req.user);
+    }
+    else{
+        accountId = req.body.accountId;
+    }
+
     try{
         return res.json(await transactionService.withdrawal({
-            accountId: req.body.accountId,
+            accountId: accountId,
             amount: req.body.amount,
             createdBy: req.user.id
         }))
@@ -45,9 +61,19 @@ async function withdrawal(req, res){
 }
 
 async function transfer(req, res){
+    var accountId;
+    if(req.user.role==='customer'){
+        accountId = await transactionService.getAccount(req.user);
+    }
+    else{
+        accountId = req.body.fromAccountId;
+    }
+
+    console.log(accountId);
+
     try{
         return res.json(await transactionService.transfer({
-            fromAccountId: req.body.fromAccountId,
+            fromAccountId: accountId,
             toAccountId: req.body.toAccountId,
             amount: req.body.amount,
             createdBy: req.user.id

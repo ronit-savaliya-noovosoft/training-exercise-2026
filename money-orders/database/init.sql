@@ -56,6 +56,12 @@ SELECT a.id
 FROM ACCOUNTS a
 WHERE cust_id=2;
 
+SELECT a.id, a.balance, u.password
+FROM accounts a
+         JOIN users u
+              ON u.id=a.cust_id
+WHERE cust_id=2;
+
 SELECT * FROM TRANSACTIONS;
 SELECT * FROM ACCOUNTS;
 SELECT * FROM USERS;

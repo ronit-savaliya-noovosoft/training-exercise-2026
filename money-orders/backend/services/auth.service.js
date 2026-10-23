@@ -19,11 +19,12 @@ async function login(email, password){
            role: user.role
         },
         process.env.JWT_SECRET,
-        { expiresIn: "1h" }
+        { expiresIn: "1d" }
     );
 
     return {
         message: "Logged in successfully",
+        status: "success",
         token,
         user: {
             id: user.id,
