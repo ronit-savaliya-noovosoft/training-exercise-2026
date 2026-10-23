@@ -1,7 +1,7 @@
-import { BASE_URL, AUTH } from "../../../../config.js";
 import {signUp} from "../../services/registerService.js";
 
 const register = document.getElementById('register');
+const message = document.getElementById('signup-message');
 
 register.addEventListener('click', async function signup(e) {
     e.preventDefault();
@@ -11,23 +11,19 @@ register.addEventListener('click', async function signup(e) {
     const password = document.getElementById('password').value;
 
     try {
-        // const response = await fetch(`${BASE_URL}${AUTH}/signup`, {
-        //     method: "POST",
-        //     credentials: "include",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({ name, email, password })
-        // });
-
         const data = await signUp(name, email, password);
 
         if (data.status === "success") {
             alert("Sign Up successful!");
             localStorage.setItem("data", JSON.stringify(data));
+            message.innerText = data.message;
             window.location.href = '../../../auth/pages/html/login.html'
         } else {
+            message.innerText = data.message;
             alert(data.message || "Sign Up failed");
         }
     } catch (error) {
+        message.innerText = error.message;
         console.error("Error:", error);
     }
 });

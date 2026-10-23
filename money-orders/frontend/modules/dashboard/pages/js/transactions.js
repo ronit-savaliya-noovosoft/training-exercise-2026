@@ -1,54 +1,10 @@
-import { BASE_URL, ACCOUNT, TRANSACTION } from "../../../../config.js";
-import { user_data } from "./information.js";
 import {
     depositInAccount, emailTransaction,
     getTransactionHistory,
     transferFromAccount,
     withdrawFromAccount
 } from "../../services/transactionService.js";
-import {getAccounts} from "../../services/accountService.js";
-
-// Dropdowns
-const dropdowns = document.querySelectorAll('#select-deposit-to, #select-withdraw-from, #select-transfer-to, #select-transfer-from');
-console.log(dropdowns);
-export async function fetchAndDisplayData(e) {
-    e.preventDefault();
-
-    try {
-        // const response = await fetch(`${BASE_URL}${ACCOUNT}/customers`,{
-        //     method: "GET",
-        //     credentials: "include",
-        //     headers: { "Content-Type": "application/json" },
-        // });
-        const result = await getAccounts();
-
-        const array = result.accounts.filter(a => a.account_id!==user_data.account_id);
-
-        console.log(array);
-
-        if(user_data.role === 'customer'){
-            for(let i=0; i<=2; i++){
-                dropdowns[i].innerHTML =`
-                    <option value="${user_data.account_id}">${user_data.name} (${user_data.account_number})</option>
-                `;
-            }
-            dropdowns[3].innerHTML = array.map(item => `
-                <option value="${item.account_id}">${item.name} (${item.account_number})</option>
-            `).join('');
-        }
-        else if(user_data.role==='manager') {
-            dropdowns.forEach((dropdown)=>{
-                dropdown.innerHTML = result.accounts.map(item => `
-                <option value="${item.account_id}">${item.name} (${item.account_number})</option>
-            `).join('');
-            });
-        }
-
-
-    } catch (err) {
-        console.log(err);
-    }
-}
+import {user_data} from "./information.js";
 
 // Transactions
 const deposit = document.getElementById('deposit');
@@ -63,25 +19,17 @@ deposit.addEventListener('click', async function deposit(e){
     console.log(accountId);
 
     try{
-        // const response = await fetch(`${BASE_URL}${TRANSACTION}/deposit`, {
-        //     method: "POST",
-        //     credentials: "include",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({ accountId, amount }),
-        // });
-
         const data = await depositInAccount(accountId, amount);
 
-        if(data.status === "success"){
-            amountInput.value = "";
-            fetchTransactionHistory();
-        }
-        else{
-            console.log("Deposit Failed: ", data);
-        }
+        message.classList.remove('text-danger');
+        message.classList.add('text-success');
+        amountInput.value = "";
 
+        fetchTransactionHistory();
         message.textContent = data.message;
     } catch (error){
+        message.classList.remove('text-success');
+        message.classList.add('text-danger');
         message.textContent = error.message;
         console.log("Error:", error);
     }
@@ -99,24 +47,17 @@ withdraw.addEventListener('click', async function withdraw(e){
     console.log(accountId);
 
     try{
-        // const response = await fetch(`${BASE_URL}${TRANSACTION}/withdrawal`, {
-        //     method: "POST",
-        //     credentials: "include",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({ accountId, amount }),
-        // });
-
         const data = await withdrawFromAccount(accountId, amount);
-        if(data.status === "success"){
-            amountInput.value = "";
-            fetchTransactionHistory();
-        }
-        else{
-            console.log("Withdrawal Failed: ", data);
-        }
 
+        message.classList.remove('text-danger');
+        message.classList.add('text-success');
+        amountInput.value = "";
+
+        fetchTransactionHistory();
         message.textContent = data.message;
     } catch (error){
+        message.classList.remove('text-success');
+        message.classList.add('text-danger');
         message.textContent = error.message;
         console.log("Error:", error);
     }
@@ -136,25 +77,17 @@ transfer.addEventListener('click', async function transfer(e){
     console.log(toAccountId);
 
     try{
-        // const response = await fetch(`${BASE_URL}${TRANSACTION}/transfer`, {
-        //     method: "POST",
-        //     credentials: "include",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({ fromAccountId, toAccountId, amount }),
-        // });
-
         const data = await transferFromAccount(fromAccountId, toAccountId, amount);
 
-        if(data.status === "success"){
-            amountInput.value = "";
-            fetchTransactionHistory();
-        }
-        else{
-            console.log("Transfer Failed: ", data);
-        }
+        message.classList.remove('text-danger');
+        message.classList.add('text-success');
+        amountInput.value = "";
 
+        fetchTransactionHistory();
         message.textContent = data.message;
     } catch (error){
+        message.classList.remove('text-success');
+        message.classList.add('text-danger');
         message.textContent = error.message;
         console.log("Error:", error);
     }
@@ -169,16 +102,9 @@ let currentPage = 1;
 const limit = 10;
 let totalPage = 0;
 
-async function fetchTransactionHistory(page = 1){
+export async function fetchTransactionHistory(page = 1){
     try {
         pagination.innerHTML = '';
-
-        // const response = await fetch(`${BASE_URL}${TRANSACTION}?page=${page}&limit=${limit}`,{
-        //     method: "GET",
-        //     credentials: "include",
-        //     headers: { "Content-Type": "application/json" },
-        // });
-
         const result = await getTransactionHistory(page, limit);
 
         currentPage = result.pagination.page;
@@ -201,12 +127,12 @@ async function fetchTransactionHistory(page = 1){
         }
 
         transactions.innerHTML = result.transactions.map(item => `
-            <tr>
+            <tr class="${item.type === 'deposit' ? 'theme-success' : (item.type === 'withdraw' ? 'theme-danger' : 'theme-warning')}">
                 <td>${item.type}</td>
                 <td>${item.sender || "-"}</td>
                 <td>${item.receiver || "-"}</td>
-                <td>${item.amount}</td>
-                <td>${item.status}</td>
+                <td class="">${item.amount}</td>
+                <td><span  class="badge center rounded-pill ${item.status === 'completed' ? 'bg-success' : (item.status === 'failed' ? 'bg-danger' : 'bg-warning')}">${item.status}</span></td>
             </tr>
         `).join('');
 
@@ -226,6 +152,7 @@ async function fetchTransactionHistory(page = 1){
     }
 }
 
+// Pagination Helper Functions
 function renderPagination(){
     pagination.innerHTML= "";
 
@@ -263,13 +190,14 @@ function addPageButton(label, page, disabled = false, active = false){
     pagination.appendChild(li);
 }
 
-window.addEventListener('DOMContentLoaded', () => fetchTransactionHistory(1));
-
 // Email the Transactions
-const filterForm = document.querySelector('.transaction-email-section');
-const user = JSON.parse(localStorage.getItem("user"));
-if(user.role === 'manager'){
-    filterForm.classList.add('hidden');
+export async function showFilterButton(){
+    const filterForm = document.querySelector('.transaction-email-section');
+    const balance_container = document.getElementById('balance-container');
+    if(user_data.role === 'manager'){
+        filterForm.classList.add('hidden');
+        balance_container.innerHTML = '<div class="fs-lg text-secondary">0.00</div>';
+    }
 }
 
 const email = document.getElementById('emailHistoryButton');
@@ -291,20 +219,6 @@ email.addEventListener("click", async function email(e) {
     message.textContent = "Sending transaction history...";
 
     try{
-        // const response = await fetch(`${BASE_URL}${TRANSACTION}/email-history`, {
-        //     method: "POST",
-        //     credentials: "include",
-        //     headers: {
-        //         "Content-Type": "application/json"
-        //     },
-        //     body: JSON.stringify({
-        //         limit: Number(records),
-        //         type: type,
-        //         fromDate: fromDate,
-        //         toDate: toDate
-        //     })
-        // });
-
         const result = await emailTransaction(records, type, fromDate, toDate);
 
         if(!(result.status === "success")){

@@ -1,30 +1,30 @@
 import { apiRequest } from "../../../utils/api.js";
-import { BASE_URL, TRANSACTION } from "../../../config.js";
+import {DEPOSIT, EMAIL_HISTORY, TRANSACTION_HISTORY, TRANSFER, WITHDRAW} from "../constants.js";
 
 export async function getTransactionHistory(page, limit){
-    return apiRequest(`${BASE_URL}${TRANSACTION}?page=${page}&limit=${limit}`, "GET");
+    return await apiRequest(`${TRANSACTION_HISTORY}?page=${page}&limit=${limit}`, "GET");
 }
 
 export async function depositInAccount(accountId, amount){
-    return apiRequest(`${BASE_URL}${TRANSACTION}/deposit`,
+    return await apiRequest(`${DEPOSIT}`,
         "POST",
         {accountId, amount});
 }
 
 export async function withdrawFromAccount(accountId, amount){
-    return apiRequest(`${BASE_URL}${TRANSACTION}/withdrawal`,
+    return await apiRequest(`${WITHDRAW}`,
         "POST",
         {accountId, amount});
 }
 
 export async function transferFromAccount(fromAccountId, toAccountId, amount){
-    return apiRequest(`${BASE_URL}${TRANSACTION}/transfer`,
+    return await apiRequest(`${TRANSFER}`,
         "POST",
         {fromAccountId, toAccountId, amount});
 }
 
 export async function emailTransaction(records, type, fromDate, toDate){
-    return apiRequest(`${BASE_URL}${TRANSACTION}/email-history`,
+    return await apiRequest(`${EMAIL_HISTORY}`,
         "POST",
         {
             limit: Number(records),

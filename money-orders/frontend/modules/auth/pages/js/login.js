@@ -1,6 +1,7 @@
 import {logIn} from "../../services/loginService.js";
 
 const login = document.getElementById('login');
+const message = document.getElementById('login-message');
 
 login.addEventListener('click', async function login(e) {
     e.preventDefault();
@@ -9,25 +10,18 @@ login.addEventListener('click', async function login(e) {
     const password = document.getElementById('password').value;
 
     try {
-        // const response = await fetch(`${BASE_URL}${AUTH}/login`, {
-        //     method: "POST",
-        //     credentials: "include",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({ email, password })
-        // });
-
         const data = await logIn(email, password);
-
-        console.log(data);
 
         if (data.status === "success") {
             localStorage.setItem("user", JSON.stringify(data.user));
             window.location.href = '../../../dashboard/pages/html/dashboard.html';
             alert("Login successful!");
         } else {
+            message.innerText = data.message;
             alert(data.message || "Login failed");
         }
     } catch (error) {
+        message.innerText = error.message;
         console.error("Error:", error);
     }
 });

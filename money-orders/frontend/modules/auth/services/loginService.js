@@ -1,12 +1,12 @@
 import {apiRequest} from "../../../utils/api.js";
-import {BASE_URL, AUTH} from "../../../config.js";
+import {LOGIN, LOGOUT} from "../constants.js";
 
 export async function logIn(email, password){
-    return await apiRequest(`${BASE_URL}${AUTH}/login`,
+    return await apiRequest(`${LOGIN}`,
         "POST",
         {email, password});
 }
 
 export async function logOut(){
-    return await apiRequest(`${BASE_URL}${AUTH}/logout`, "POST");
+    return await apiRequest(`${LOGOUT}`, "POST");
 }
