@@ -33,12 +33,27 @@ services:
     environment:
       - NODE_ENV=development
 
+
   mailhog:
     image: mailhog/mailhog
     container_name: banking-mailhog
     ports:
       - "1025:1025"
       - "8025:8025"
+
+
+  worker-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run worker:dev
+
 
 volumes:
   pgdata:
