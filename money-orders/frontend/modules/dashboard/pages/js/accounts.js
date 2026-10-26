@@ -1,18 +1,15 @@
-import { user_data } from "./information.js";
 import {getAccountBalance, getAccounts} from "../../services/accountService.js";
 
 let accounts;
 
 // Dropdowns
 const dropdowns = document.querySelectorAll('#select-deposit-to, #select-withdraw-from, #select-transfer-to, #select-transfer-from');
-export async function fetchAndDisplayAccounts(e) {
-    e.preventDefault();
+export async function fetchAndDisplayAccounts(user_data) {
+    const messages = document.getElementsByClassName('dropdown-message');
 
     try {
         const result = await getAccounts();
         accounts = result.accounts;
-
-        console.log(accounts);
 
         if(user_data.role === 'customer'){
             for(let i=0; i<=2; i++){
@@ -29,8 +26,15 @@ export async function fetchAndDisplayAccounts(e) {
                 `).join('');
             }
         }
+
+        // Array.from(messages).forEach(div => {
+        //     div.innerHTML += `<span> ${result.message}</span>`;
+        // });
     } catch (e) {
         console.log(e);
+        Array.from(messages).forEach(div => {
+            div.innerHTML += `<span> ${e.message}</span>`;
+        });
     }
 }
 
@@ -51,6 +55,8 @@ const toggleBalance = document.getElementById('toggleBalance');
 let balanceVisible = false;
 let currentBalance = null;
 toggleBalance.addEventListener('click', async () => {
+    const message = document.getElementById("verify-balance-message");
+
     if(balanceVisible){
         accountBalance.textContent = "******";
         balanceVisible = false;
@@ -61,6 +67,7 @@ toggleBalance.addEventListener('click', async () => {
 
     if(!password){
         console.log("Please enter password");
+        return;
     }
 
     try{
@@ -70,6 +77,7 @@ toggleBalance.addEventListener('click', async () => {
         balanceVisible = true;
     }
     catch (e){
+        message.textContent = e.message;
         console.log(e.message);
     }
 });

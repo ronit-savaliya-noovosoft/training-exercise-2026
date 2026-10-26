@@ -2,18 +2,14 @@ import {getMyself} from "../../services/informationService.js";
 import {logOut} from "../../../auth/services/loginService.js";
 
 // Display User Information
-export let user_data = null;
 const user_name = document.getElementById('user_name');
 const user_email = document.getElementById('user_email');
 const user_role = document.getElementById('user_role');
 const avatar = document.getElementById('avatar');
 const user_account = document.getElementById('user_account');
-// const account_balance = document.getElementById('account_balance');
 
 // Get Me
-export async function fetchMe(e){
-    e.preventDefault();
-
+export async function fetchMe(){
     const result = await getMyself();
 
     const hour = new Date().getHours();
@@ -34,7 +30,7 @@ export async function fetchMe(e){
 
     avatar.innerText = parts.length>=2? parts[0][0]+parts[1][0] : parts[0][0];
 
-    user_data = result.user;
+    return result.user;
 }
 
 

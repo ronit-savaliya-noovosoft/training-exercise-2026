@@ -41,6 +41,7 @@
                                     <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
                                 </svg>
                             </a>
+                            <span id="verify-balance-message"></span>
                         </div>
                     </div>
                 </div>
@@ -56,16 +57,16 @@
 
                                     </select>
                                 </div>
+                                <div class="dropdown-message mt-2"></div>
                             </div>
                             <div class="col-auto">
                                 <label class="" for="deposit-amount">Amount:</label>
-                                <input type="text" class="form-control" id="deposit-amount" placeholder="XXX">
+                                <input type="number" class="form-control" id="deposit-amount" placeholder="XXX">
                             </div>
                             <div class="col-12">
                                 <button id="deposit" class="btn btn-success">Deposit</button>
                             </div>
                         </form>
-                        <div id="deposit-message"></div>
                     </div>
                     <div class="col-12 col-md-5 border border-dark border-1 rounded pt-2 ms-auto">
                         <div class="title h4">Withdrawal Amount</div>
@@ -78,10 +79,11 @@
 
                                     </select>
                                 </div>
+                                <div class="dropdown-message mt-2"></div>
                             </div>
                             <div class="col-auto">
                                 <label class="" for="withdraw-amount">Amount:</label>
-                                <input type="text" class="form-control" id="withdraw-amount" placeholder="XXX">
+                                <input type="number" class="form-control" id="withdraw-amount" placeholder="XXX">
                             </div>
                             <div class="col-12">
                                 <button class="btn btn-danger" id="withdraw">Withdraw</button>
@@ -103,6 +105,7 @@
 
                                     </select>
                                 </div>
+                                <div class="dropdown-message mt-2"></div>
                             </div>
                             <div class="col-auto">
                                 <label class="" for="select-transfer-to">To:</label>
@@ -112,10 +115,11 @@
 
                                     </select>
                                 </div>
+                                <div class="dropdown-message mt-2"></div>
                             </div>
                             <div class="col-auto">
                                 <label class="" for="transfer-amount">Amount:</label>
-                                <input type="text" class="form-control" id="transfer-amount" placeholder="XXX">
+                                <input type="number" class="form-control" id="transfer-amount" placeholder="XXX">
                             </div>
                             <div class="col-12">
                                 <button id="transfer" class="btn btn-warning">Transfer</button>
@@ -146,12 +150,7 @@
                                             <div class="row gap-2 form-field">
                                                 <div class="col">
                                                     <label for="emailRecordLimit">Records</label>
-                                                    <select id="emailRecordLimit" class="form-select">
-                                                        <option value="10">Last 10</option>
-                                                        <option value="25">Last 25</option>
-                                                        <option value="50">Last 50</option>
-                                                        <option value="100">Last 100</option>
-                                                    </select>
+                                                    <input type="number" class="form-control w-12" id="emailRecordLimit">
 
                                                     <label for="emailTransactionType">Transaction Type</label>
                                                     <select id="emailTransactionType" class="form-select">
@@ -201,6 +200,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <div id="transactionHistoryMessage"></div>
                     </div>
                 </div>
             </div>

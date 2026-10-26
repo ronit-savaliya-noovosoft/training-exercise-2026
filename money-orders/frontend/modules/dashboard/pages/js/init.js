@@ -3,10 +3,10 @@ import {fetchAndDisplayAccounts, updateTransferToDropdown} from "./accounts.js";
 import {fetchTransactionHistory, showFilterButton} from "./transactions.js";
 
 window.addEventListener('DOMContentLoaded', async (e) => {
-    await fetchMe(e);
-    await fetchAndDisplayAccounts(e);
+    const user_data = await fetchMe();
+    await fetchAndDisplayAccounts(user_data);
     await updateTransferToDropdown();
-    await showFilterButton();
+    await showFilterButton(user_data);
 });
 
 fetchTransactionHistory(1);

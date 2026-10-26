@@ -4,26 +4,51 @@ import {
     transferFromAccount,
     withdrawFromAccount
 } from "../../services/transactionService.js";
-import {user_data} from "./information.js";
+
+const depositBtn = document.getElementById('deposit');
+const withdrawBtn = document.getElementById('withdraw');
+const transferBtn = document.getElementById('transfer');
+
+depositBtn.disabled = true;
+withdrawBtn.disabled = true;
+transferBtn.disabled = true;
+
+const deposit_amount = document.getElementById('deposit-amount');
+const withdraw_amount = document.getElementById('withdraw-amount');
+const transfer_amount = document.getElementById('transfer-amount');
+
+deposit_amount.addEventListener('input', () => {
+    depositBtn.disabled = deposit_amount.value === '';
+});
+
+withdraw_amount.addEventListener('input', () => {
+    withdrawBtn.disabled = withdraw_amount.value === '';
+});
+
+transfer_amount.addEventListener('input', () => {
+    transferBtn.disabled = transfer_amount.value === '';
+});
+
 
 // Transactions
-const deposit = document.getElementById('deposit');
 deposit.addEventListener('click', async function deposit(e){
     e.preventDefault();
 
-    const amountInput = document.getElementById('deposit-amount');
-    const amount = amountInput.value;
+    const amount = deposit_amount.value;
     const accountId = document.getElementById('select-deposit-to').value;
     const message = document.getElementById('deposit-message');
 
-    console.log(accountId);
+    if(amount===""){
+        message.textContent = "Amount is required";
+    }
 
     try{
         const data = await depositInAccount(accountId, amount);
 
         message.classList.remove('text-danger');
         message.classList.add('text-success');
-        amountInput.value = "";
+        deposit_amount.value = "";
+        depositBtn.disabled = true;
 
         fetchTransactionHistory();
         message.textContent = data.message;
@@ -35,23 +60,24 @@ deposit.addEventListener('click', async function deposit(e){
     }
 });
 
-const withdraw = document.getElementById('withdraw');
 withdraw.addEventListener('click', async function withdraw(e){
     e.preventDefault();
 
-    const amountInput = document.getElementById('withdraw-amount');
-    const amount = amountInput.value;
+    const amount = withdraw_amount.value;
     const accountId = document.getElementById('select-withdraw-from').value;
     const message = document.getElementById('withdraw-message');
 
-    console.log(accountId);
+    if(amount===""){
+        message.textContent = "Amount is required";
+    }
 
     try{
         const data = await withdrawFromAccount(accountId, amount);
 
         message.classList.remove('text-danger');
         message.classList.add('text-success');
-        amountInput.value = "";
+        withdraw_amount.value = "";
+        withdrawBtn.disabled = true;
 
         fetchTransactionHistory();
         message.textContent = data.message;
@@ -63,25 +89,25 @@ withdraw.addEventListener('click', async function withdraw(e){
     }
 });
 
-const transfer = document.getElementById('transfer');
 transfer.addEventListener('click', async function transfer(e){
     e.preventDefault();
 
-    const amountInput = document.getElementById('transfer-amount');
-    const amount = amountInput.value;
+    const amount = transfer_amount.value;
     const fromAccountId = document.getElementById('select-transfer-from').value;
     const toAccountId = document.getElementById('select-transfer-to').value;
     const message = document.getElementById('transfer-message');
 
-    console.log(fromAccountId);
-    console.log(toAccountId);
+    if(amount===""){
+        message.textContent = "Amount is required";
+    }
 
     try{
         const data = await transferFromAccount(fromAccountId, toAccountId, amount);
 
         message.classList.remove('text-danger');
         message.classList.add('text-success');
-        amountInput.value = "";
+        transfer_amount.value = "";
+        transferBtn.disabled = true;
 
         fetchTransactionHistory();
         message.textContent = data.message;
@@ -103,6 +129,7 @@ const limit = 10;
 let totalPage = 0;
 
 export async function fetchTransactionHistory(page = 1){
+    const message = document.getElementById("transactionHistoryMessage");
     try {
         pagination.innerHTML = '';
         const result = await getTransactionHistory(page, limit);
@@ -127,7 +154,7 @@ export async function fetchTransactionHistory(page = 1){
         }
 
         transactions.innerHTML = result.transactions.map(item => `
-            <tr class="${item.type === 'deposit' ? 'theme-success' : (item.type === 'withdraw' ? 'theme-danger' : 'theme-warning')}">
+            <tr>
                 <td>${item.type}</td>
                 <td>${item.sender || "-"}</td>
                 <td>${item.receiver || "-"}</td>
@@ -139,15 +166,13 @@ export async function fetchTransactionHistory(page = 1){
         const start = (currentPage-1)*limit+1;
         const end = start + result.transactions.length-1;
 
-        console.log(result.transactions.length);
-
         paginationInfo.textContent = `Showing ${start}-${end} of ${result.pagination.total} transactions`;
 
         renderPagination();
-
-        console.log(result);
     }
     catch (error){
+        message.classList.add('text-danger');
+        message.innerText = error.message;
         console.log(error);
     }
 }
@@ -191,7 +216,7 @@ function addPageButton(label, page, disabled = false, active = false){
 }
 
 // Email the Transactions
-export async function showFilterButton(){
+export async function showFilterButton(user_data){
     const filterForm = document.querySelector('.transaction-email-section');
     const balance_container = document.getElementById('balance-container');
     if(user_data.role === 'manager'){
@@ -209,6 +234,11 @@ email.addEventListener("click", async function email(e) {
     const type = document.getElementById('emailTransactionType').value;
     const fromDate = document.getElementById('emailFromDate').value;
     const toDate = document.getElementById('emailToDate').value;
+
+    if(records === "" || Number(records)<=0){
+        message.textContent = "Please enter how many transaction you need, Empty or negative value not allowed";
+        return;
+    }
 
     if(fromDate && toDate && fromDate>toDate){
         message.textContent = "From date can not be after to date";

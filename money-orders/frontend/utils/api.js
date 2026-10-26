@@ -20,6 +20,6 @@ export async function apiRequest(url, method = "GET", body = null){
         return data;
     }
     catch (e){
-        console.log(e.message);
+        throw e;
     }
 }
