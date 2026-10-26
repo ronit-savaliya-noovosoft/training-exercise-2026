@@ -45,10 +45,20 @@ async function createAccount(account_number, cust_id, balance){
     );
 }
 
+async function checkEmail(email){
+    const result = await db.query(
+        queries.CHECK_EMAIL,
+        [email]
+    );
+
+    return result.rowCount;
+}
+
 module.exports = {
     getCustomerProfile,
     getUserProfile,
     createCustomer,
     createAccount,
-    findUserByEmail
+    findUserByEmail,
+    checkEmail
 };

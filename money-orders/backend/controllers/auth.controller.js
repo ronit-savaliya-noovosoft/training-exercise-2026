@@ -39,7 +39,7 @@ async function login(req, res){
         console.error(e);
 
         return res.status(500).json({
-           message: "Server error"
+           message: e.message
         });
     }
 }
@@ -61,7 +61,7 @@ async function getMe(req, res){
     }
     catch (e){
         return res.status(500).json({
-            message: "Server Error"
+            message: e.message
         });
     }
 }
@@ -82,7 +82,7 @@ async function signup(req, res){
     }
     catch (e){
         return res.status(500).json({
-            message: "Account already exists!"
+            message: e.message
         });
     }
 }

@@ -5,6 +5,10 @@ const jwt = require("jsonwebtoken");
 async function login(email, password){
     const user = await authRepository.findUserByEmail(email);
 
+    if(!user){
+        throw new Error("User not exists");
+    }
+
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if(!passwordMatch){
@@ -36,6 +40,15 @@ async function login(email, password){
 }
 
 async function signup(name, email, password){
+    const exist = await authRepository.checkEmail(email);
+
+    if(exist >= 1){
+        return {
+            status: "failed",
+            message: "Email already registered"
+        }
+    }
+
     const passwordHash = await bcrypt.hash(password, 10);
 
     const result = await authRepository.createCustomer(name, email, passwordHash);
@@ -63,5 +76,6 @@ async function getMe(user){
 
     return authRepository.getUserProfile(user.id);
 }
+
 
 module.exports = { login, signup, getMe };

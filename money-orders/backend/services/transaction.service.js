@@ -97,7 +97,7 @@ async function deposit({ accountId, amount, createdBy }){
         });
 
 
-        return { status: "success", message: "Deposit Successfully" };
+        return { status: "success", message: "Deposit Processing..." };
     }
     catch (e){
 
@@ -130,7 +130,7 @@ async function withdrawal({ accountId, amount, createdBy }){
             status: TRANSACTION_STATUS.PENDING
         }) ;
 
-        return { status: "success", message: "Withdrawal Successfully" };
+        return { status: "success", message: "Withdrawal Processing..." };
     }
     catch (e){
         await recordFailedTransaction(transaction);
@@ -168,7 +168,7 @@ async function transfer({ fromAccountId, toAccountId, amount, createdBy }){
         });
 
 
-        return { status: "success", message: "Transfer Successfully" };
+        return { status: "success", message: "Transfer Processing..." };
     }
     catch (e){
         await recordFailedTransaction(transaction);
@@ -183,7 +183,7 @@ async function transfer({ fromAccountId, toAccountId, amount, createdBy }){
 async function emailTransactionHistory(user, filters){
     const { limit=10, type, fromDate, toDate } = filters;
 
-    const allowedTypes = ["deposit", "withdraw", "transfer"];
+    const allowedTypes = Object.values(TRANSACTION_TYPE);
 
     if(type && type!=="all" && !allowedTypes.includes(type.toLowerCase())){
         console.error("Invalid transaction type");

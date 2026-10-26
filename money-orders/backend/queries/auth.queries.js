@@ -33,4 +33,11 @@ const GET_USER_PROFILE = `
     WHERE u.id = $1
 `;
 
-module.exports = { LOGIN_USER, CREATE_CUSTOMER, GET_CUSTOMER_PROFILE, GET_USER_PROFILE };
+const CHECK_EMAIL = `
+    SELECT 1 
+    FROM users 
+    WHERE email = $1
+    LIMIT 1
+`;
+
+module.exports = { LOGIN_USER, CREATE_CUSTOMER, GET_CUSTOMER_PROFILE, GET_USER_PROFILE, CHECK_EMAIL };
