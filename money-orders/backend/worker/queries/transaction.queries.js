@@ -1,3 +1,24 @@
+const GET_PENDING_TRANSACTION_IDS = `
+    SELECT id
+    FROM TRANSACTIONS
+    WHERE status = 'pending'
+    ORDER BY created_at ASC
+    LIMIT $1
+`;
+
+const GET_TRANSACTION_FOR_UPDATE = `
+    SELECT
+        id,
+        type,
+        from_account_id,
+        to_account_id,
+        amount
+    FROM TRANSACTIONS
+    WHERE status = 'pending'
+        AND id = $1
+    FOR UPDATE
+`;
+
 const GET_NEXT_PENDING_TRANSACTION = `
     SELECT
         id,
@@ -48,6 +69,8 @@ const MARK_TRANSACTION_FAILED = `
 `;
 
 module.exports = {
+    GET_PENDING_TRANSACTION_IDS,
+    GET_TRANSACTION_FOR_UPDATE,
     GET_NEXT_PENDING_TRANSACTION,
     GET_ACCOUNTS_FOR_UPDATE,
     DEPOSIT_AMOUNT,

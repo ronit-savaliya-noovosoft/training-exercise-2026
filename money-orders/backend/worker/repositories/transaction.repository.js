@@ -1,6 +1,15 @@
 const db = require("../../config/db");
 const queries = require("../queries/transaction.queries");
 
+async function getPendingTransactionIds(limit = 10){
+    const result = await db.query(
+        queries.GET_PENDING_TRANSACTION_IDS,
+        [limit]
+    );
+
+    return result.rows.map(transaction => transaction.id);
+}
+
 async function withTransaction(callback){
     const client = await db.connect();
 
@@ -20,6 +29,15 @@ async function withTransaction(callback){
     finally {
         client.release();
     }
+}
+
+async function getTransactionForUpdate(client, transactionId){
+    const result = await client.query(
+        queries.GET_TRANSACTION_FOR_UPDATE,
+        [transactionId]
+    );
+
+    return result.rows[0];
 }
 
 async function getNextPendingTransaction(client){
@@ -71,6 +89,8 @@ async function markFailed(client, transactionId){
 
 module.exports = {
     withTransaction,
+    getTransactionForUpdate,
+    getPendingTransactionIds,
     getNextPendingTransaction,
     getAccountsForUpdate,
     depositAmount,

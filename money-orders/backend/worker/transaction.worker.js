@@ -1,6 +1,6 @@
 const transactionService = require("./services/transaction.service");
+const {processPendingBatch} = require("./services/transaction.service");
 
-const BATCH_SIZE = 10;
 const POLL_INTERVAL = 5000;
 
 const sleep = (ms) => {
@@ -14,16 +14,10 @@ async function startWorker(){
 
     while (true){
         try {
-            let processCount=0;
+            let processCount = await processPendingBatch();
 
-            while (processCount<BATCH_SIZE){
-                const found = await transactionService.processNextTransaction();
-
-                if(!found){
-                    break;
-                }
-
-                processCount++;
+            if(processCount > 0){
+                console.log(`Process ${processCount} transaction(s).`)
             }
         }
         catch (e){
