@@ -5,8 +5,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "npx nodemon -L server.js",
-    "worker": "node worker/transaction.worker.js",
-    "worker:dev": "npx nodemon -L worker/transaction.worker.js"
+    "worker": "node worker/jobs.worker.js",
+    "worker:dev": "npx nodemon -L worker/jobs.worker.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

@@ -1,12 +1,14 @@
 const db = require("../config/db");
 const accountRepository = require("../repositories/account.repository");
 const transactionRepository = require("../repositories/transaction.repository");
+const jobsRepository = require("../worker/repositories/jobs.repository");
 const {
     TRANSACTION_TYPE,
     TRANSACTION_STATUS
 } = require("../constants/transactions.constants");
 
 const transporter = require("../config/email");
+const {JOB_TYPE} = require("../worker/constants/jobs.constants");
 
 function createError(message, statusCode, code) {
     const error = new Error(message);
@@ -75,11 +77,37 @@ async function getAccount(user){
     return await transactionRepository.getAccountByCustomerId(user.id);
 }
 
+async function createPendingTransaction(transaction){
+    const client = await db.connect();
+
+    try{
+        await client.query("BEGIN");
+
+        const createdTransaction = await transactionRepository.createTransactions(client, {
+            ...transaction,
+            status: TRANSACTION_STATUS.PENDING
+        });
+
+        await jobsRepository.createJob(client, transaction.type, {
+            transactionId: createdTransaction.id
+        });
+
+        await client.query("COMMIT");
+
+        return createdTransaction;
+    }
+    catch (e) {
+        await client.query("ROLLBACK");
+        throw e;
+    }
+    finally {
+        client.release();
+    }
+}
+
 async function deposit({ accountId, amount, createdBy }){
     const id = validateAccountId(accountId);
     const value = validateAmount(amount);
-
-    const client = await db.connect();
 
     const transaction = {
         type: TRANSACTION_TYPE.DEPOSIT,
@@ -90,30 +118,18 @@ async function deposit({ accountId, amount, createdBy }){
     }
 
     try{
-
-        await transactionRepository.createTransactions(client, {
-            ...transaction,
-            status: TRANSACTION_STATUS.PENDING
-        });
-
-
-        return { status: "success", message: "Deposit Processing..." };
+        await createPendingTransaction(transaction);
+        return { status: "success", message: "Deposit request submitted successfully" };
     }
     catch (e){
-
         await recordFailedTransaction(transaction);
-        return { status: "failed", message: "Deposit Failed" };
-    }
-    finally {
-        client.release();
+        return { status: "failed", message: "Deposit request failed" };
     }
 }
 
 async function withdrawal({ accountId, amount, createdBy }){
     const id = validateAccountId(accountId);
     const value = validateAmount(amount);
-
-    const client = await db.connect();
 
     const transaction = {
         type: TRANSACTION_TYPE.WITHDRAWAL,
@@ -123,22 +139,13 @@ async function withdrawal({ accountId, amount, createdBy }){
         createdBy
     }
 
-
     try{
-        await transactionRepository.createTransactions(client,{
-            ...transaction,
-            status: TRANSACTION_STATUS.PENDING
-        }) ;
-
-        return { status: "success", message: "Withdrawal Processing..." };
+        await createPendingTransaction(transaction);
+        return { status: "success", message: "Withdraw request submitted successfully" };
     }
     catch (e){
         await recordFailedTransaction(transaction);
-
-        return { status: "failed", message: "Withdrawal Failed" };
-    }
-    finally {
-        client.release();
+        return { status: "failed", message: "Withdraw request failed" };
     }
 }
 
@@ -151,7 +158,6 @@ async function transfer({ fromAccountId, toAccountId, amount, createdBy }){
         throw createError("Accounts must be different", 400, "SAME_ACCOUNT_TRANSFER")
     }
 
-    const client = await db.connect();
     const transaction = {
         type: TRANSACTION_TYPE.TRANSFER,
         fromAccountId: fromId,
@@ -160,23 +166,13 @@ async function transfer({ fromAccountId, toAccountId, amount, createdBy }){
         createdBy
     };
 
-
     try{
-        await transactionRepository.createTransactions(client, {
-            ...transaction,
-            status: TRANSACTION_STATUS.PENDING
-        });
-
-
-        return { status: "success", message: "Transfer Processing..." };
+        await createPendingTransaction(transaction);
+        return { status: "success", message: "Transfer request submitted successfully" };
     }
     catch (e){
         await recordFailedTransaction(transaction);
-
-        return { status: "failed", message: "Transfer Failed" };
-    }
-    finally {
-        client.release();
+        return { status: "failed", message: "Transfer request failed" };
     }
 }
 
@@ -186,73 +182,46 @@ async function emailTransactionHistory(user, filters){
     const allowedTypes = Object.values(TRANSACTION_TYPE);
 
     if(type && type!=="all" && !allowedTypes.includes(type.toLowerCase())){
-        console.error("Invalid transaction type");
-        return;
+        throw createError("Invalid transaction type", 400, "INVALID_TRANSACTION_TYPE");
+    }
+    
+    const jobData = {
+        user: {
+            id: user.id,
+            name: user.name,
+            email: user.email
+        },
+        filters: {
+            limit: limit,
+            type: type || "all",
+            fromDate: fromDate || null,
+            toDate: toDate || null
+        }
+    };
+
+    const client = await db.connect();
+    try{
+        await client.query("BEGIN");
+
+        await jobsRepository.createJob(client, JOB_TYPE.MAIL, jobData);
+
+        await client.query("COMMIT");
+
+        return {
+            status: "success",
+            message: "Transaction history email queued successfully"
+        }
+    }
+    catch (e){
+        await client.query("ROLLBACK");
+        throw e;
+    }
+    finally {
+        client.release();
     }
 
-    const transactions = await transactionRepository.getTransactionsForEmail(
-        user.id,
-        !type || type === "all" ? null : type,
-        fromDate || null,
-        toDate || null,
-        limit
-    );
-
-    const rows = transactions.map((transaction)=>
-    `
-        <tr>
-            <td>${transaction.id}</td>
-            <td>${transaction.type}</td>
-            <td>${transaction.amount}</td>
-            <td>${transaction.sender}</td>
-            <td>${transaction.receiver}</td>
-            <td>${new Date(transaction.created_at).toLocaleString()}</td>
-        </tr>
-    `
-    ).join("");
-
-    let html;
-    if (transactions.length === 0){
-        html = `<h3>No Transaction found for selected filter</h3>`;
-        console.error("No Transaction found for selected filter");
-    }
-    else {
-        html = `
-            <h2>Your Transaction History</h2>
-            <p>Hello! ${user.name},</p>
-            <p>Here are you latest transactions matching your selected filter.</p>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Type</th>
-                        <th>Amount</th>
-                        <th>From Account</th>
-                        <th>To Account</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${rows}
-                </tbody>
-            </table>
-            <p>Records included: ${transactions.length}</p>
-        `;
-    }
-
-    await transporter.sendMail({
-        from: '"Banking App" <banking-app@localhost>',
-        to: user.email,
-        subject: "Your Transaction History",
-        html: html
-    });
-
-    return {
-        status: "success",
-        message: "Transaction History sent successfully",
-        recordSent: transactions.length
-    }
 }
+
 
 module.exports = {
     getHistory,

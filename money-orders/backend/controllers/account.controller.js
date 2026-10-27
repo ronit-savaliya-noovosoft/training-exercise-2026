@@ -28,7 +28,7 @@ async function getAccountBalance(req, res){
     }
     catch (e){
         return res.status(500).json({
-            message: "Server Error"
+            message: e.message
         });
     }
 }

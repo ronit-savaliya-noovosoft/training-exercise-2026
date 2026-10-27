@@ -9,12 +9,18 @@ async function getAccountBalance(custId, password){
     const account = await accountRepository.getAccountBalance(custId);
     console.log(account);
 
-    const passwordMatch = await bcrypt.compare(password, account.password);
+    try{
+        const passwordMatch = await bcrypt.compare(password, account.password);
 
-    if(!passwordMatch){
-        console.log("Password does not match");
-        return null;
+        if(!passwordMatch){
+            console.log("Password does not match");
+            throw new Error("Password does not match");
+        }
     }
+    catch (e){
+        throw e;
+    }
+
 
     return account;
 }

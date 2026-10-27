@@ -7,6 +7,7 @@ const db = require("./config/db");
 const transactionRoutes = require("./routes/transaction.routes");
 const authRoutes = require("./routes/auth.routes");
 const accountRoutes = require("./routes/account.routes");
+const jobRoutes = require("./routes/job.routes");
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.get("/api/health", async (req, res)=> {
 app.use("/api/auth", authRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/accounts", accountRoutes);
+app.use("/api/jobs", jobRoutes);
 
 const PORT = process.env.PORT;
 

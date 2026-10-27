@@ -16,6 +16,8 @@ async function createTransactions(client, transaction){
        type, fromAccountId, toAccountId, amount, status, createdBy
     ]);
 
+    console.log(`Inserted Row ${result.rows[0]}`);
+
     return result.rows[0];
 }
 

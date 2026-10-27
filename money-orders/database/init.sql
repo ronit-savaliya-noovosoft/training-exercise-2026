@@ -25,6 +25,18 @@ CREATE TABLE TRANSACTIONS (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE JOBS (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(255) NOT NULL,
+    data JSONB NOT NULL DEFAULT '{}'::jsonb,
+    status VARCHAR(255) NOT NULL DEFAULT 'pending' CHECK ( status IN ('pending', 'in_process', 'failed', 'completed') ),
+    attempts INTEGER NOT NULL DEFAULT 0,
+    max_attempts INTEGER NOT NULL DEFAULT 3,
+    last_error VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 INSERT INTO accounts (account_number, cust_id, balance)
 VALUES ('4321 8765 0987 6545', 3, 5000);
 
@@ -62,12 +74,17 @@ FROM accounts a
               ON u.id=a.cust_id
 WHERE cust_id=2;
 
-SELECT * FROM TRANSACTIONS;
+SELECT * FROM TRANSACTIONS
+WHERE id>=140
+ORDER BY id;
 SELECT * FROM ACCOUNTS;
 SELECT * FROM USERS;
+SELECT * FROM JOBS
+ORDER BY id;
 
-DELETE FROM USERS
-WHERE id=6;
+ALTER TABLE USERS
+ADD CONSTRAINT users_role_check CHECK (role IN ('customer', 'manager', 'admin'));
+
 
 SELECT CURRENT_TIMESTAMP;
 
