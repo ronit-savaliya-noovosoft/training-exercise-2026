@@ -24,8 +24,9 @@ export async function fetchMe(){
 
     user_email.innerText = result.user.email;
     user_role.innerText = result.user.role;
-    user_account.innerText = result.user.account_number===undefined ? "Logged in as Manager" :result.user.account_number;
-
+    if(user_account!==null){
+        user_account.innerText = result.user.account_number===undefined ? `Logged in as ${result.user.role}` :result.user.account_number;
+    }
     let parts = result.user.name.split(" ");
 
     avatar.innerText = parts.length>=2? parts[0][0]+parts[1][0] : parts[0][0];

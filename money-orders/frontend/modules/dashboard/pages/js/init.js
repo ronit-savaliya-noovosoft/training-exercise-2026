@@ -10,6 +10,6 @@ window.addEventListener('DOMContentLoaded', async (e) => {
 });
 
 fetchTransactionHistory(1);
-// window.addEventListener('DOMContentLoaded', async (e) => {
-//    setInterval(fetchTransactionHistory, 15000);
-// });
+window.addEventListener('DOMContentLoaded', async (e) => {
+   setInterval(fetchTransactionHistory, 15000);
+});

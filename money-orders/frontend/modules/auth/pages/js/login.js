@@ -24,9 +24,12 @@ login.addEventListener('click', async function login(e) {
         const data = await logIn(email, password);
 
         if (data.status === "success") {
-            window.location.href = '../../../dashboard/pages/html/dashboard.html';
+            window.location.href = data.user.role ==="admin"
+                ? '../../../dashboard/pages/html/admin_dashboard.html'
+                : '../../../dashboard/pages/html/dashboard.html';
             alert("Login successful!");
-        } else {
+        }
+        else {
             message.innerText = data.message;
             alert(data.message || "Login failed");
         }

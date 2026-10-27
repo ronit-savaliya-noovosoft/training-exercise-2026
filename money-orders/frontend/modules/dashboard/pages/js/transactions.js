@@ -30,6 +30,25 @@ transfer_amount.addEventListener('input', () => {
 });
 
 
+// Transactions Helper Function
+function verifyAmount(amount, element){
+    if(amount===""){
+        element.classList.remove('text-success');
+        element.classList.add('text-danger');
+        element.textContent = "Amount is required";
+        return false;
+    }
+    else if(amount<=0){
+        element.classList.remove('text-success');
+        element.classList.add('text-danger');
+        element.textContent = "Invalid Amount";
+        return false;
+    }
+
+    return true;
+}
+
+
 // Transactions
 deposit.addEventListener('click', async function deposit(e){
     e.preventDefault();
@@ -38,8 +57,8 @@ deposit.addEventListener('click', async function deposit(e){
     const accountId = document.getElementById('select-deposit-to').value;
     const message = document.getElementById('deposit-message');
 
-    if(amount===""){
-        message.textContent = "Amount is required";
+    if(!verifyAmount(amount, message)){
+        return;
     }
 
     try{
@@ -67,8 +86,8 @@ withdraw.addEventListener('click', async function withdraw(e){
     const accountId = document.getElementById('select-withdraw-from').value;
     const message = document.getElementById('withdraw-message');
 
-    if(amount===""){
-        message.textContent = "Amount is required";
+    if(!verifyAmount(amount, message)){
+        return;
     }
 
     try{
@@ -97,8 +116,8 @@ transfer.addEventListener('click', async function transfer(e){
     const toAccountId = document.getElementById('select-transfer-to').value;
     const message = document.getElementById('transfer-message');
 
-    if(amount===""){
-        message.textContent = "Amount is required";
+    if(!verifyAmount(amount, message)){
+        return;
     }
 
     try{
@@ -159,7 +178,7 @@ export async function fetchTransactionHistory(page = 1){
                 <td>${item.sender || "-"}</td>
                 <td>${item.receiver || "-"}</td>
                 <td class="">${item.amount}</td>
-                <td><span  class="badge center rounded-pill ${item.status === 'completed' ? 'bg-success' : (item.status === 'failed' ? 'bg-danger' : 'bg-warning')}">${item.status}</span></td>
+                <td><span class="badge center rounded-pill ${item.status === 'completed' ? 'bg-success' : (item.status === 'failed' ? 'bg-danger' : 'bg-warning')}">${item.status}</span></td>
             </tr>
         `).join('');
 
@@ -255,7 +274,7 @@ email.addEventListener("click", async function email(e) {
             throw new Error(result.message || "Failed to send email");
         }
 
-        message.textContent = `${result.message}: ${result.recordSent}`;
+        message.textContent = `${result.message}`;
     }
     catch (e){
         message.textContent = e.message;

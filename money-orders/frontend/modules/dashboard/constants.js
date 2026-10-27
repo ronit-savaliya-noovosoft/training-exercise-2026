@@ -1,4 +1,4 @@
-import {ACCOUNT, AUTH, BASE_URL, TRANSACTION} from "../../config.js";
+import {ACCOUNT, AUTH, BASE_URL, TRANSACTION, JOB} from "../../config.js";
 
 export const CUSTOMER_ACCOUNTS = `${BASE_URL}${ACCOUNT}/customers`;
 export const VERIFY_BALANCE = `${BASE_URL}${ACCOUNT}/verify-balance`;
@@ -10,3 +10,5 @@ export const DEPOSIT = `${BASE_URL}${TRANSACTION}/deposit`;
 export const WITHDRAW = `${BASE_URL}${TRANSACTION}/withdrawal`;
 export const TRANSFER = `${BASE_URL}${TRANSACTION}/transfer`;
 export const EMAIL_HISTORY = `${BASE_URL}${TRANSACTION}/email-history`;
+
+export const JOB_HISTORY = `${BASE_URL}${JOB}`;

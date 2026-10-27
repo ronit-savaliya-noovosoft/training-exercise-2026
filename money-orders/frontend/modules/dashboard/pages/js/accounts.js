@@ -56,6 +56,7 @@ let balanceVisible = false;
 let currentBalance = null;
 toggleBalance.addEventListener('click', async () => {
     const message = document.getElementById("verify-balance-message");
+    message.textContent = "";
 
     if(balanceVisible){
         accountBalance.textContent = "******";
@@ -78,6 +79,7 @@ toggleBalance.addEventListener('click', async () => {
     }
     catch (e){
         message.textContent = e.message;
+        message.classList.add("text-danger");
         console.log(e.message);
     }
 });
