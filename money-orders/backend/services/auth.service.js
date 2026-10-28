@@ -1,4 +1,5 @@
 const authRepository = require("../repositories/auth.repository");
+const db = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -49,19 +50,39 @@ async function signup(name, email, password){
         }
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const client = await db.connect();
 
-    const result = await authRepository.createCustomer(name, email, passwordHash);
+    try{
+        await client.query("BEGIN");
 
-    const customerId = result.rows[0].id;
+        const passwordHash = await bcrypt.hash(password, 10);
+        const result = await authRepository.createCustomer(client, name, email, passwordHash);
+        const customerId = result.rows[0].id;
 
-    const min = 1000000000000000;
-    const max = 9999999999999999;
-    const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+        // const min = 1000000000000000;
+        // const max = 9999999999999999;
+        // const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
 
-    const accountNumber = randomNumber.toString().replace(/(.{4})/g, '$1 ').trim();
+        const lastAccountNo = await authRepository.getLastAccountNumber();
+        const newAccountNo = Number(lastAccountNo.replaceAll(" ", ""))+1;
 
-    await authRepository.createAccount(accountNumber, customerId, 0);
+        if(isNaN(newAccountNo)){
+            await client.query("ROLLBACK");
+            return;
+        }
+
+        const accountNumber = newAccountNo.toString().replace(/(.{4})/g, '$1 ').trim();
+        await authRepository.createAccount(client, accountNumber, customerId, 0);
+
+        await client.query("COMMIT");
+    }
+    catch (e) {
+        await client.query("ROLLBACK");
+        throw e;
+    }
+    finally {
+        await client.release();
+    }
 
     return {
         status: "success",

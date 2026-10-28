@@ -40,4 +40,16 @@ const CHECK_EMAIL = `
     LIMIT 1
 `;
 
-module.exports = { LOGIN_USER, CREATE_CUSTOMER, GET_CUSTOMER_PROFILE, GET_USER_PROFILE, CHECK_EMAIL };
+const GET_LAST_ACCOUNT_NO = `
+    SELECT MAX(account_number)
+    FROM ACCOUNTS    
+`;
+
+module.exports = {
+    LOGIN_USER,
+    CREATE_CUSTOMER,
+    GET_CUSTOMER_PROFILE,
+    GET_USER_PROFILE,
+    CHECK_EMAIL,
+    GET_LAST_ACCOUNT_NO
+};

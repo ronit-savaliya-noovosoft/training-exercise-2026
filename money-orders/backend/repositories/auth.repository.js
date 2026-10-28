@@ -31,15 +31,15 @@ async function getUserProfile(userId){
     return result.rows[0];
 }
 
-async function createCustomer(name, email, password){
-    return await db.query(
+async function createCustomer(client, name, email, password){
+    return await client.query(
         queries.CREATE_CUSTOMER,
         [name, email, password, "customer"]
     );
 }
 
-async function createAccount(account_number, cust_id, balance){
-    return await db.query(
+async function createAccount(client, account_number, cust_id, balance){
+    return await client.query(
         accountQueries.CREATE_ACCOUNT,
         [account_number, cust_id, balance]
     );
@@ -54,11 +54,20 @@ async function checkEmail(email){
     return result.rowCount;
 }
 
+async function getLastAccountNumber(){
+    const result = await db.query(
+        queries.GET_LAST_ACCOUNT_NO
+    );
+
+    return result.rows[0].max;
+}
+
 module.exports = {
     getCustomerProfile,
     getUserProfile,
     createCustomer,
     createAccount,
     findUserByEmail,
-    checkEmail
+    checkEmail,
+    getLastAccountNumber
 };

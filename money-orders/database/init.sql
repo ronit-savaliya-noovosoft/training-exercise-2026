@@ -20,7 +20,7 @@ CREATE TABLE TRANSACTIONS (
     from_account_id INT REFERENCES ACCOUNTS(id),
     to_account_id INT REFERENCES ACCOUNTS(id),
     amount DECIMAL(10, 2),
-    status VARCHAR(255) NOT NULL CHECK ( status IN ('pending', 'in_process', 'failed', 'completed') ),
+    status VARCHAR(255) NOT NULL CHECK ( status IN ('pending', 'failed', 'completed') ),
     created_by INT REFERENCES USERS(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -81,6 +81,15 @@ SELECT * FROM ACCOUNTS;
 SELECT * FROM USERS;
 SELECT * FROM JOBS
 ORDER BY id;
+
+SELECT MAX(account_number)
+FROM ACCOUNTS;
+
+DELETE FROM ACCOUNTS
+WHERE account_number = 'NaN';
+
+DELETE FROM USERS
+WHERE id = 19;
 
 ALTER TABLE USERS
 ADD CONSTRAINT users_role_check CHECK (role IN ('customer', 'manager', 'admin'));

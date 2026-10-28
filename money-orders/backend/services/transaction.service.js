@@ -51,7 +51,6 @@ async function recordFailedTransaction(transaction){
 
 async function getHistory(user, query){
     const page = Math.max(1, parseInt(query.page, 10) || 1);
-    // const limit = Math.min(10, Math.max(1, parseInt(req.query.limit, 10) || 1));
     const limit = Math.max(10, parseInt(query.limit) || 1);
     const offset = (page-1) * limit;
 
