@@ -25,7 +25,7 @@ login.addEventListener('click', async function login(e) {
 
         if (data.status === "success") {
             window.location.href = data.user.role ==="admin"
-                ? '../../../dashboard/pages/html/admin_dashboard.html'
+                ? '../../../job/pages/html/admin_dashboard.html'
                 : '../../../dashboard/pages/html/dashboard.html';
             alert("Login successful!");
         }

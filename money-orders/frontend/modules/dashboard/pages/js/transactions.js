@@ -4,6 +4,8 @@ import {
     transferFromAccount,
     withdrawFromAccount
 } from "../../services/transactionService.js";
+import {updatePaginationInfo, renderPagination} from "../../../../utils/pagination.js";
+import {verifyAmount, titleCase} from "../../../../utils/utils.js";
 
 const depositBtn = document.getElementById('deposit');
 const withdrawBtn = document.getElementById('withdraw');
@@ -30,38 +32,19 @@ transfer_amount.addEventListener('input', () => {
 });
 
 
-// Transactions Helper Function
-function verifyAmount(amount, element){
-    if(amount===""){
-        element.classList.remove('text-success');
-        element.classList.add('text-danger');
-        element.textContent = "Amount is required";
-        return false;
-    }
-    else if(amount<=0){
-        element.classList.remove('text-success');
-        element.classList.add('text-danger');
-        element.textContent = "Invalid Amount";
-        return false;
-    }
-
-    return true;
-}
-
-
 // Transactions
-deposit.addEventListener('click', async function deposit(e){
+depositBtn.addEventListener('click', async function deposit(e) {
     e.preventDefault();
 
     const amount = deposit_amount.value;
     const accountId = document.getElementById('select-deposit-to').value;
     const message = document.getElementById('deposit-message');
 
-    if(!verifyAmount(amount, message)){
+    if (!verifyAmount(amount, message)) {
         return;
     }
 
-    try{
+    try {
         const data = await depositInAccount(accountId, amount);
 
         message.classList.remove('text-danger');
@@ -71,7 +54,7 @@ deposit.addEventListener('click', async function deposit(e){
 
         fetchTransactionHistory();
         message.textContent = data.message;
-    } catch (error){
+    } catch (error) {
         message.classList.remove('text-success');
         message.classList.add('text-danger');
         message.textContent = error.message;
@@ -79,18 +62,18 @@ deposit.addEventListener('click', async function deposit(e){
     }
 });
 
-withdraw.addEventListener('click', async function withdraw(e){
+withdrawBtn.addEventListener('click', async function withdraw(e) {
     e.preventDefault();
 
     const amount = withdraw_amount.value;
     const accountId = document.getElementById('select-withdraw-from').value;
     const message = document.getElementById('withdraw-message');
 
-    if(!verifyAmount(amount, message)){
+    if (!verifyAmount(amount, message)) {
         return;
     }
 
-    try{
+    try {
         const data = await withdrawFromAccount(accountId, amount);
 
         message.classList.remove('text-danger');
@@ -100,7 +83,7 @@ withdraw.addEventListener('click', async function withdraw(e){
 
         fetchTransactionHistory();
         message.textContent = data.message;
-    } catch (error){
+    } catch (error) {
         message.classList.remove('text-success');
         message.classList.add('text-danger');
         message.textContent = error.message;
@@ -108,7 +91,7 @@ withdraw.addEventListener('click', async function withdraw(e){
     }
 });
 
-transfer.addEventListener('click', async function transfer(e){
+transferBtn.addEventListener('click', async function transfer(e) {
     e.preventDefault();
 
     const amount = transfer_amount.value;
@@ -116,11 +99,11 @@ transfer.addEventListener('click', async function transfer(e){
     const toAccountId = document.getElementById('select-transfer-to').value;
     const message = document.getElementById('transfer-message');
 
-    if(!verifyAmount(amount, message)){
+    if (!verifyAmount(amount, message)) {
         return;
     }
 
-    try{
+    try {
         const data = await transferFromAccount(fromAccountId, toAccountId, amount);
 
         message.classList.remove('text-danger');
@@ -130,7 +113,7 @@ transfer.addEventListener('click', async function transfer(e){
 
         fetchTransactionHistory();
         message.textContent = data.message;
-    } catch (error){
+    } catch (error) {
         message.classList.remove('text-success');
         message.classList.add('text-danger');
         message.textContent = error.message;
@@ -143,11 +126,11 @@ const transactions = document.getElementById('transactions');
 const pagination = document.getElementById('pagination');
 const paginationInfo = document.getElementById('paginationInfo');
 
-let currentPage = 1;
+export let currentPage = 1;
 const limit = 10;
 let totalPage = 0;
 
-export async function fetchTransactionHistory(page = 1){
+export async function fetchTransactionHistory(page = 1) {
     const message = document.getElementById("transactionHistoryMessage");
     try {
         pagination.innerHTML = '';
@@ -156,89 +139,56 @@ export async function fetchTransactionHistory(page = 1){
         currentPage = result.pagination.page;
         totalPage = result.pagination.totalPages;
 
-        if(result.status === 'success'){
-            if(result.transactions.length === 0){
-                transactions.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="text-center text-muted py-4">
-                            No transactions found.
-                        </td>
-                    </tr>
-                `;
-
-                paginationInfo.textContent = "Showing 0 transactions";
-                renderPagination();
-                return;
-            }
+        if (result.status !== 'success') {
+            throw new Error(result.message || "Failed to fetch Transactions");
         }
 
-        transactions.innerHTML = result.transactions.map(item => `
-            <tr>
-                <td>${item.type}</td>
-                <td>${item.sender || "-"}</td>
-                <td>${item.receiver || "-"}</td>
-                <td class="">${item.amount}</td>
-                <td><span class="badge center rounded-pill ${item.status === 'completed' ? 'bg-success' : (item.status === 'failed' ? 'bg-danger' : 'bg-warning')}">${item.status}</span></td>
-            </tr>
-        `).join('');
+        if (result.transactions.length === 0) {
+            transactions.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">
+                        No transactions found.
+                    </td>
+                </tr>
+            `;
+        } else {
+            transactions.innerHTML = result.transactions.map(item => `
+                    <tr>
+                        <td>${titleCase(item.type)}</td>
+                        <td>${item.sender || "-"}</td>
+                        <td>${item.receiver || "-"}</td>
+                        <td class="">${item.amount}</td>
+                        <td><span class="badge center rounded-pill ${item.status === 'completed' ? 'bg-success' : (item.status === 'failed' ? 'bg-danger' : 'bg-warning')}">${item.status}</span></td>
+                    </tr>
+                `).join('');
 
-        const start = (currentPage-1)*limit+1;
-        const end = start + result.transactions.length-1;
+            renderPagination({
+                container: pagination,
+                currentPage,
+                totalPage: totalPage,
+                onPageChange: fetchTransactionHistory
+            });
+        }
 
-        paginationInfo.textContent = `Showing ${start}-${end} of ${result.pagination.total} transactions`;
-
-        renderPagination();
-    }
-    catch (error){
+        updatePaginationInfo({
+            element: paginationInfo,
+            currentPage,
+            limit: limit,
+            total: result.pagination.total || 0,
+            currentCount: result.transactions.length
+        });
+    } catch (error) {
         message.classList.add('text-danger');
         message.innerText = error.message;
         console.log(error);
     }
 }
 
-// Pagination Helper Functions
-function renderPagination(){
-    pagination.innerHTML= "";
-
-    if(totalPage<=1){
-        return;
-    }
-
-    addPageButton("Previous", currentPage-1, currentPage===1);
-
-    for(let page =1; page<=totalPage; page++){
-        addPageButton(page, page, false, page === currentPage);
-    }
-
-    addPageButton("Next", currentPage+1, currentPage===totalPage);
-}
-
-function addPageButton(label, page, disabled = false, active = false){
-    const li = document.createElement("li");
-
-    li.className = `page-item${disabled ? " disabled": ""}${active ? " active": ""}`;
-
-    const button = document.createElement("button");
-
-    button.type= "button";
-    button.className = "page-link";
-    button.innerHTML = label;
-
-    button.disabled = disabled;
-
-    button.addEventListener("click", () => {
-        fetchTransactionHistory(page);
-    });
-
-    li.appendChild(button);
-    pagination.appendChild(li);
-}
-
 // Email the Transactions
-export async function showFilterButton(user_data){
+export async function showFilterButton(user_data) {
     const filterForm = document.querySelector('.transaction-email-section');
     const balance_container = document.getElementById('balance-container');
-    if(user_data.role === 'manager'){
+    if (user_data.role === 'manager') {
         filterForm.classList.add('hidden');
         balance_container.innerHTML = '<div class="fs-lg text-secondary">0.00</div>';
     }
@@ -254,12 +204,12 @@ email.addEventListener("click", async function email(e) {
     const fromDate = document.getElementById('emailFromDate').value;
     const toDate = document.getElementById('emailToDate').value;
 
-    if(records === "" || Number(records)<=0){
+    if (records === "" || Number(records) <= 0) {
         message.textContent = "Please enter how many transaction you need, Empty or negative value not allowed";
         return;
     }
 
-    if(fromDate && toDate && fromDate>toDate){
+    if (fromDate && toDate && fromDate > toDate) {
         message.textContent = "From date can not be after to date";
         return;
     }
@@ -267,19 +217,12 @@ email.addEventListener("click", async function email(e) {
     button.disabled = true;
     message.textContent = "Sending transaction history...";
 
-    try{
+    try {
         const result = await emailTransaction(records, type, fromDate, toDate);
-
-        if(!(result.status === "success")){
-            throw new Error(result.message || "Failed to send email");
-        }
-
         message.textContent = `${result.message}`;
-    }
-    catch (e){
+    } catch (e) {
         message.textContent = e.message;
-    }
-    finally {
+    } finally {
         button.disabled = false;
     }
 });
