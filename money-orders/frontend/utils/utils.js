@@ -1,5 +1,7 @@
 // Transactions Helper Function
-function verifyAmount(amount, element){
+import {getBalanceOfSelectedCustomer} from "../modules/dashboard/services/accountService.js";
+
+async function verifyAmount(amount, element, accountId){
     if(amount===""){
         element.classList.remove('text-success');
         element.classList.add('text-danger');
@@ -11,6 +13,18 @@ function verifyAmount(amount, element){
         element.classList.add('text-danger');
         element.textContent = "Invalid Amount";
         return false;
+    }
+    else {
+        const result = await getBalanceOfSelectedCustomer(accountId);
+
+        if(result.balance<amount){
+            element.classList.remove('text-success');
+            element.classList.add('text-danger');
+            element.textContent = "Insufficient Balance";
+
+            return false;
+        }
+
     }
 
     return true;
@@ -28,6 +42,10 @@ function flattenObject(ob){
     let result = {};
 
     for (const i in ob) {
+        if(ob[i] === null){
+            continue;
+        }
+
         if ((typeof ob[i]) === 'object' && !Array.isArray(ob[i])) {
             const temp = flattenObject(ob[i]);
             for (const j in temp) {

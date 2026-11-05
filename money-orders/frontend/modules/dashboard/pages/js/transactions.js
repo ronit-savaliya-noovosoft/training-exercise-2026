@@ -7,6 +7,8 @@ import {
 import {updatePaginationInfo, renderPagination} from "../../../../utils/pagination.js";
 import {verifyAmount, titleCase} from "../../../../utils/utils.js";
 
+const MESSAGE_SHOW_TIME = 5000;
+
 const depositBtn = document.getElementById('deposit');
 const withdrawBtn = document.getElementById('withdraw');
 const transferBtn = document.getElementById('transfer');
@@ -40,7 +42,7 @@ depositBtn.addEventListener('click', async function deposit(e) {
     const accountId = document.getElementById('select-deposit-to').value;
     const message = document.getElementById('deposit-message');
 
-    if (!verifyAmount(amount, message)) {
+    if (!await verifyAmount(amount, message, accountId)) {
         return;
     }
 
@@ -52,8 +54,13 @@ depositBtn.addEventListener('click', async function deposit(e) {
         deposit_amount.value = "";
         depositBtn.disabled = true;
 
+
         fetchTransactionHistory();
         message.textContent = data.message;
+        message.style.display = "block";
+        setTimeout(() => {
+            message.style.display = "none";
+        }, MESSAGE_SHOW_TIME);
     } catch (error) {
         message.classList.remove('text-success');
         message.classList.add('text-danger');
@@ -69,7 +76,7 @@ withdrawBtn.addEventListener('click', async function withdraw(e) {
     const accountId = document.getElementById('select-withdraw-from').value;
     const message = document.getElementById('withdraw-message');
 
-    if (!verifyAmount(amount, message)) {
+    if (!await verifyAmount(amount, message, accountId)) {
         return;
     }
 
@@ -83,6 +90,10 @@ withdrawBtn.addEventListener('click', async function withdraw(e) {
 
         fetchTransactionHistory();
         message.textContent = data.message;
+        message.style.display = "block";
+        setTimeout(() => {
+            message.style.display = "none";
+        }, MESSAGE_SHOW_TIME);
     } catch (error) {
         message.classList.remove('text-success');
         message.classList.add('text-danger');
@@ -99,7 +110,7 @@ transferBtn.addEventListener('click', async function transfer(e) {
     const toAccountId = document.getElementById('select-transfer-to').value;
     const message = document.getElementById('transfer-message');
 
-    if (!verifyAmount(amount, message)) {
+    if (!await verifyAmount(amount, message, fromAccountId)) {
         return;
     }
 
@@ -113,6 +124,10 @@ transferBtn.addEventListener('click', async function transfer(e) {
 
         fetchTransactionHistory();
         message.textContent = data.message;
+        message.style.display = "block";
+        setTimeout(() => {
+            message.style.display = "none";
+        }, MESSAGE_SHOW_TIME);
     } catch (error) {
         message.classList.remove('text-success');
         message.classList.add('text-danger');
@@ -195,21 +210,30 @@ export async function showFilterButton(user_data) {
 }
 
 const email = document.getElementById('emailHistoryButton');
-email.addEventListener("click", async function email(e) {
+email.addEventListener("click", async function email() {
     const message = document.getElementById('emailHistoryMessage');
     const button = document.getElementById('emailHistoryButton');
 
-    const records = document.getElementById('emailRecordLimit').value;
-    const type = document.getElementById('emailTransactionType').value;
-    const fromDate = document.getElementById('emailFromDate').value;
-    const toDate = document.getElementById('emailToDate').value;
+    const recordsElement = document.getElementById('emailRecordLimit');
+    const typeElement = document.getElementById('emailTransactionType');
+    const fromDateElement = document.getElementById('emailFromDate');
+    const toDateElement = document.getElementById('emailToDate');
+
+    const records = recordsElement.value;
+    const type = typeElement.value;
+    const fromDate = fromDateElement.value;
+    const toDate = toDateElement.value;
 
     if (records === "" || Number(records) <= 0) {
+        message.classList.remove('text-success');
+        message.classList.add('text-danger');
         message.textContent = "Please enter how many transaction you need, Empty or negative value not allowed";
         return;
     }
 
     if (fromDate && toDate && fromDate > toDate) {
+        message.classList.remove('text-success');
+        message.classList.add('text-danger');
         message.textContent = "From date can not be after to date";
         return;
     }
@@ -219,8 +243,22 @@ email.addEventListener("click", async function email(e) {
 
     try {
         const result = await emailTransaction(records, type, fromDate, toDate);
+        recordsElement.value = "";
+        typeElement.value = "all";
+        fromDateElement.value = null;
+        toDateElement.value = null;
+
+        message.classList.remove('text-danger');
+        message.classList.add('text-success');
         message.textContent = `${result.message}`;
+        message.style.display = "block";
+        setTimeout(() => {
+            message.style.display = "none";
+        }, MESSAGE_SHOW_TIME);
+
     } catch (e) {
+        message.classList.remove('text-success');
+        message.classList.add('text-danger');
         message.textContent = e.message;
     } finally {
         button.disabled = false;

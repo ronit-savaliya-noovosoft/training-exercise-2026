@@ -2,6 +2,7 @@ import {ACCOUNT, AUTH, BASE_URL, TRANSACTION} from "../../config.js";
 
 export const CUSTOMER_ACCOUNTS = `${BASE_URL}${ACCOUNT}/customers`;
 export const VERIFY_BALANCE = `${BASE_URL}${ACCOUNT}/verify-balance`;
+export const GET_BALANCE = `${BASE_URL}${ACCOUNT}/get-balance`;
 
 export const ME = `${BASE_URL}${AUTH}/me`;
 

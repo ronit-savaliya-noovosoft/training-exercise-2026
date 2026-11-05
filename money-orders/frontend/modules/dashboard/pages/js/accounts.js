@@ -1,12 +1,13 @@
-import {getAccountBalance, getAccounts} from "../../services/accountService.js";
+import {getAccountBalance, getAccounts, getBalanceOfSelectedCustomer} from "../../services/accountService.js";
 
 let accounts;
 
 // Dropdowns
 const dropdowns = document.querySelectorAll('#select-deposit-to, #select-withdraw-from, #select-transfer-to, #select-transfer-from');
-export async function fetchAndDisplayAccounts(user_data) {
-    const messages = document.getElementsByClassName('dropdown-message');
+const messages = document.querySelectorAll('#select-deposit-to-message, #select-withdraw-from-message, #select-transfer-to-message, #select-transfer-from-message');
+const common_message = document.getElementsByClassName('common-message');
 
+export async function fetchAndDisplayAccounts(user_data) {
     try {
         const result = await getAccounts();
         accounts = result.accounts;
@@ -24,12 +25,11 @@ export async function fetchAndDisplayAccounts(user_data) {
                 dropdowns[i].innerHTML = accounts.map(item => `
                     <option value="${item.account_id}">${item.name} (${item.account_number})</option>
                 `).join('');
+
+                const result = await getBalanceOfSelectedCustomer(dropdowns[i].value);
+                messages[i].textContent =  result.balance;
             }
         }
-
-        // Array.from(messages).forEach(div => {
-        //     div.innerHTML += `<span> ${result.message}</span>`;
-        // });
     } catch (e) {
         console.log(e);
         Array.from(messages).forEach(div => {
@@ -38,15 +38,51 @@ export async function fetchAndDisplayAccounts(user_data) {
     }
 }
 
-export async function updateTransferToDropdown(){
+export async function showAndVerifyBalance(messageDiv, accountId){
+    if(messageDiv.textContent!==""){
+        const result = await getBalanceOfSelectedCustomer(accountId);
+        messageDiv.textContent =  result.balance;
+    }
+}
+
+export async function updateTransferToDropdown(user_data){
     dropdowns[3].innerHTML = accounts
         .filter(item => String(item.account_id) !== String(dropdowns[2].value))
         .map(item => `
                   <option value="${item.account_id}">${item.name} (${item.account_number})</option>
             `).join('');
+
+    if(user_data.role==="manager"){
+        const result = await getBalanceOfSelectedCustomer(dropdowns[3].value);
+        messages[3].textContent = result.balance;
+    }
+}
+
+export async function showFilterMessage(user_data) {
+    if(user_data.role === "customer"){
+        for(let i=0; i<=3; i++){
+            common_message[i].replaceChildren();
+        }
+    }
 }
 
 dropdowns[2].addEventListener('change', updateTransferToDropdown);
+dropdowns[0].addEventListener('change', async () => {
+   await showAndVerifyBalance(messages[0], dropdowns[0].value);
+});
+
+dropdowns[1].addEventListener('change', async () => {
+    await showAndVerifyBalance(messages[1], dropdowns[1].value);
+});
+
+dropdowns[2].addEventListener('change', async () => {
+    await showAndVerifyBalance(messages[2], dropdowns[2].value);
+});
+
+dropdowns[3].addEventListener('change', async () => {
+    await showAndVerifyBalance(messages[3], dropdowns[3].value);
+});
+
 
 // Verify Account Balance
 const accountBalance = document.getElementById('accountBalance');

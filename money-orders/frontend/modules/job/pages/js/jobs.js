@@ -1,13 +1,12 @@
 import {getJobHistory} from "../../services/jobService.js";
 import {fetchMe} from "../../../dashboard/pages/js/information.js";
 import {renderPagination, updatePaginationInfo} from "../../../../utils/pagination.js";
-import {flattenObject} from "../../../../utils/utils.js";
+import {flattenObject, titleCase} from "../../../../utils/utils.js";
 
 const jobs = document.getElementById('jobs');
 const pagination = document.getElementById('pagination');
 const paginationInfo = document.getElementById('paginationInfo');
 const message = document.getElementById("jobHistoryMessage");
-console.log(message);
 
 let currentPage = 1;
 const limit = 10;
@@ -46,7 +45,7 @@ async function fetchJobHistory(page = 1) {
         } else {
             jobs.innerHTML = result.jobs.map(item => `
                     <tr>
-                        <td>${item.type}</td>
+                        <td>${titleCase(item.type)}</td>
                         <td class="text-truncate">
                             ${(Object.entries(flattenObject(item.data))).map(([key, value]) => `<div><span class="key" style="font-weight:bold;">${key}:</span><span class="text-secondary">  ${value}</span></div>`).join('') || "-"}
                         </td>
