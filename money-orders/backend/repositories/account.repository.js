@@ -31,4 +31,23 @@ async function getAccountBalance(custId){
     return result.rows[0] || null;
 }
 
-module.exports = { updateBalance, getAccountForUpdate, getCustomerAccounts, getAccountBalance };
+async function getAccountBalanceByAccountId(accountId){
+    const result = await db.query(queries.GET_ACCOUNT_BALANCE_BY_ACCOUNT_ID, [accountId]);
+
+    return result.rows[0] || null;
+}
+
+async function getAccountDetails(client, accountId){
+    const result = await client.query(queries.GET_ACCOUNT_DETAILS, [accountId]);
+
+    return result.rows;
+}
+
+module.exports = {
+    updateBalance,
+    getAccountForUpdate,
+    getCustomerAccounts,
+    getAccountBalance,
+    getAccountDetails,
+    getAccountBalanceByAccountId
+};

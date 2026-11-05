@@ -87,8 +87,21 @@ async function createPendingTransaction(transaction){
             status: TRANSACTION_STATUS.PENDING
         });
 
+        const accountIds = [
+            transaction.fromAccountId, transaction.toAccountId
+        ].filter(id => id!==null);
+
+        const accounts = await accountRepository.getAccountDetails(client, accountIds);
+        let fromAccountDetails = accounts.find(account => account.id === transaction.fromAccountId) || {};
+        let toAccountDetails = accounts.find(account => account.id === transaction.toAccountId) || {};
+
         await jobsRepository.createJob(client, transaction.type, {
-            transactionId: createdTransaction.id
+            transactionId: createdTransaction.id,
+            fromAccountNumber: fromAccountDetails.account_number || null,
+            fromUserName: fromAccountDetails.name || null,
+            toAccountNumber: toAccountDetails.account_number || null,
+            toUserName: toAccountDetails.name || null,
+            amount: createdTransaction.amount
         });
 
         await client.query("COMMIT");
@@ -170,6 +183,7 @@ async function transfer({ fromAccountId, toAccountId, amount, createdBy }){
         return { status: "success", message: "Transfer request submitted successfully" };
     }
     catch (e){
+        console.log(e);
         await recordFailedTransaction(transaction);
         return { status: "failed", message: "Transfer request failed" };
     }

@@ -8,7 +8,6 @@ async function getJobHistory(query){
     const jobs = await jobRepository.getJobs(limit, offset);
     const total = await jobRepository.countJobs();
 
-    console.log(jobs);
     return {
         status: "success",
         jobs,

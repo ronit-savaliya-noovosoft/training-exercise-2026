@@ -7,7 +7,6 @@ async function getCustomerAccounts(){
 
 async function getAccountBalance(custId, password){
     const account = await accountRepository.getAccountBalance(custId);
-    console.log(account);
 
     try{
         const passwordMatch = await bcrypt.compare(password, account.password);
@@ -25,4 +24,12 @@ async function getAccountBalance(custId, password){
     return account;
 }
 
-module.exports = { getCustomerAccounts, getAccountBalance };
+async function getBalanceOfSelectedCustomer(accountId){
+    return await accountRepository.getAccountBalanceByAccountId(accountId);
+}
+
+module.exports = {
+    getCustomerAccounts,
+    getAccountBalance,
+    getBalanceOfSelectedCustomer
+};

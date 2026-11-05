@@ -39,4 +39,27 @@ const GET_ACCOUNT_BALANCE = `
     WHERE cust_id=$1
 `;
 
-module.exports = { UPDATE_BALANCE, GET_ACCOUNT_FOR_UPDATE, CREATE_ACCOUNT, GET_CUSTOMER_ACCOUNTS, GET_ACCOUNT_BY_CUSTOMER_ID, GET_ACCOUNT_BALANCE };
+const GET_ACCOUNT_DETAILS = `
+    SELECT a.id as id, a.account_number, u.name 
+    FROM accounts a
+    JOIN users u 
+    ON u.id=a.cust_id
+    WHERE a.id=ANY($1)
+`;
+
+const GET_ACCOUNT_BALANCE_BY_ACCOUNT_ID = `
+    SELECT a.id, a.balance
+    FROM accounts a 
+    WHERE a.id=$1
+`;
+
+module.exports = {
+    UPDATE_BALANCE,
+    GET_ACCOUNT_FOR_UPDATE,
+    CREATE_ACCOUNT,
+    GET_CUSTOMER_ACCOUNTS,
+    GET_ACCOUNT_BY_CUSTOMER_ID,
+    GET_ACCOUNT_BALANCE,
+    GET_ACCOUNT_BALANCE_BY_ACCOUNT_ID,
+    GET_ACCOUNT_DETAILS
+};
