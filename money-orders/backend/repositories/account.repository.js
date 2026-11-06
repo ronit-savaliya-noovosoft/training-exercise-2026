@@ -41,8 +41,8 @@ async function getAccountByCustomer(accountId, customerId){
     return result.rows[0];
 }
 
-async function createAccount(account_number, cust_id, balance){
-    return await db.query(
+async function createAccount(client, account_number, cust_id, balance){
+    return await client.query(
         queries.CREATE_ACCOUNT,
         [account_number, cust_id, balance]
     );

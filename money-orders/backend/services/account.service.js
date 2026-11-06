@@ -1,6 +1,7 @@
 const accountRepository = require("../repositories/account.repository");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const db = require("../config/db");
 
 async function getCustomerAccounts(){
     return await accountRepository.getCustomerAccounts();
@@ -59,15 +60,25 @@ async function selectAccount(user, accountId){
 }
 
 async function createAccount(user){
+    const client = await db.connect();
+
     try{
+        await client.query("BEGIN");
+
         const lastAccountNo = await accountRepository.getLastAccountNumber();
         const newAccountNo = Number(lastAccountNo.replaceAll(" ", ""))+1;
 
         const accountNumber = newAccountNo.toString().replace(/(.{4})/g, '$1 ').trim();
-        await accountRepository.createAccount(accountNumber, user.id, 0);
+        await accountRepository.createAccount(client, accountNumber, user.id, 0);
+
+        await client.query("COMMIT");
     }
     catch (e) {
+        await client.query("ROLLBACK");
         throw e;
+    }
+    finally {
+        await client.release();
     }
 }
 
