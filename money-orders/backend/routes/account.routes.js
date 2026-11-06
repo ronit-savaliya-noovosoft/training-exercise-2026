@@ -8,6 +8,9 @@ const router= express.Router();
 router.get("/customers", authenticateToken, authorizeRole("customer", "manager"), accountController.getCustomerAccounts);
 router.post("/verify-balance", authenticateToken, authorizeRole("customer"), accountController.getAccountBalance);
 router.post("/get-balance", authenticateToken, authorizeRole("customer", "manager"), accountController.getBalanceOfSelectedCustomer);
+router.get("/my-accounts", authenticateToken, authorizeRole("customer"), accountController.getMyAccounts);
+router.post("/select", authenticateToken, authorizeRole("customer"), accountController.selectAccount);
+router.post("/create-account", authenticateToken, authorizeRole("customer"), accountController.createAccount);
 
 
 module.exports = router;

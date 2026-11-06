@@ -7,7 +7,6 @@ const {
     TRANSACTION_STATUS
 } = require("../constants/transactions.constants");
 
-const transporter = require("../config/email");
 const {JOB_TYPE} = require("../worker/constants/jobs.constants");
 
 function createError(message, statusCode, code) {
@@ -73,7 +72,7 @@ async function getAccount(user){
         return null;
     }
 
-    return await transactionRepository.getAccountByCustomerId(user.id);
+    return await transactionRepository.getAccountByCustomerId(user.id, user.activeAccountId);
 }
 
 async function createPendingTransaction(transaction){
@@ -202,7 +201,8 @@ async function emailTransactionHistory(user, filters){
         user: {
             id: user.id,
             name: user.name,
-            email: user.email
+            email: user.email,
+            accountId: user.activeAccountId
         },
         filters: {
             limit: limit,

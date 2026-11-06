@@ -18,7 +18,7 @@ async function getCustomerAccounts(req, res){
 
 async function getAccountBalance(req, res){
     try{
-        const result = await accountService.getAccountBalance(req.user.id, req.body.password);
+        const result = await accountService.getAccountBalance(req.user, req.body.password);
 
         return res.json({
             message: "Balance fetched successfully",
@@ -36,8 +36,6 @@ async function getBalanceOfSelectedCustomer(req, res){
     try{
         const result = await accountService.getBalanceOfSelectedCustomer(req.body.id);
 
-        console.log(result);
-
         return res.json({
             message: "Balance fetched successfully",
             balance: result.balance
@@ -50,8 +48,75 @@ async function getBalanceOfSelectedCustomer(req, res){
     }
 }
 
+async function getMyAccounts(req, res, next){
+    try{
+        const accounts = await accountService.getMyAccounts(req.user);
+
+        return res.status(200).json({
+           status: "success",
+           message: "Accounts fetched successfully",
+           accounts
+        });
+    }
+    catch (e) {
+        next(e);
+    }
+}
+
+async function selectAccount(req, res, next){
+    try {
+        const { accountId } = req.body;
+
+        if(!accountId){
+            return res.status(400).json({
+                status: "failed",
+                message: "Account ID is required"
+            });
+        }
+
+        const result = await accountService.selectAccount(req.user, accountId);
+
+        res.cookie("token", result.token, {
+           httpOnly: true,
+           sameSite: "strict",
+           maxAge: 24*60*60*1000
+        });
+
+        return res.status(200).json({
+            status: result.status,
+            message: result.message,
+            account: result.account
+        });
+    }
+    catch (e) {
+        next(e);
+    }
+}
+
+async function createAccount(req, res){
+    try{
+        const result = await accountService.createAccount(
+            req.user
+        );
+
+        return res.status(200).json({
+            status: "success",
+            message: "account created successfully",
+            result
+        });
+    }
+    catch (e){
+        return res.status(500).json({
+            message: "Failed to create an account"
+        });
+    }
+}
+
 module.exports = {
     getCustomerAccounts,
     getAccountBalance,
-    getBalanceOfSelectedCustomer
+    getBalanceOfSelectedCustomer,
+    getMyAccounts,
+    selectAccount,
+    createAccount
 };

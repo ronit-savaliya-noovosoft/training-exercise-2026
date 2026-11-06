@@ -1,4 +1,5 @@
 const authRepository = require("../repositories/auth.repository");
+const accountRepository = require("../repositories/account.repository");
 const db = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -63,7 +64,7 @@ async function signup(name, email, password){
         // const max = 9999999999999999;
         // const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
 
-        const lastAccountNo = await authRepository.getLastAccountNumber();
+        const lastAccountNo = await accountRepository.getLastAccountNumber();
         const newAccountNo = Number(lastAccountNo.replaceAll(" ", ""))+1;
 
         if(isNaN(newAccountNo)){
@@ -72,7 +73,7 @@ async function signup(name, email, password){
         }
 
         const accountNumber = newAccountNo.toString().replace(/(.{4})/g, '$1 ').trim();
-        await authRepository.createAccount(client, accountNumber, customerId, 0);
+        await accountRepository.createAccount(client, accountNumber, customerId, 0);
 
         await client.query("COMMIT");
     }
@@ -92,7 +93,7 @@ async function signup(name, email, password){
 
 async function getMe(user){
     if(user.role === "customer"){
-        return authRepository.getCustomerProfile(user.id);
+        return authRepository.getCustomerProfile(user.id, user.activeAccountId);
     }
 
     return authRepository.getUserProfile(user.id);

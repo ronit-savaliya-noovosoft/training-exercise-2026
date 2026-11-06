@@ -13,10 +13,10 @@ async function findUserByEmail(email){
     return result.rows[0];
 }
 
-async function getCustomerProfile(userId){
+async function getCustomerProfile(userId, accountId){
     const result = await db.query(
         queries.GET_CUSTOMER_PROFILE,
-        [userId]
+        [userId, accountId]
     );
 
     return result.rows[0];
@@ -38,13 +38,6 @@ async function createCustomer(client, name, email, password){
     );
 }
 
-async function createAccount(client, account_number, cust_id, balance){
-    return await client.query(
-        accountQueries.CREATE_ACCOUNT,
-        [account_number, cust_id, balance]
-    );
-}
-
 async function checkEmail(email){
     const result = await db.query(
         queries.CHECK_EMAIL,
@@ -54,20 +47,10 @@ async function checkEmail(email){
     return result.rowCount;
 }
 
-async function getLastAccountNumber(){
-    const result = await db.query(
-        queries.GET_LAST_ACCOUNT_NO
-    );
-
-    return result.rows[0].max;
-}
-
 module.exports = {
     getCustomerProfile,
     getUserProfile,
     createCustomer,
-    createAccount,
     findUserByEmail,
     checkEmail,
-    getLastAccountNumber
 };

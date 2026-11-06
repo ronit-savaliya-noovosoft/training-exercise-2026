@@ -40,8 +40,9 @@ const GET_TRANSACTIONS_FOR_EMAIL = `
     AND ($2::text IS NULL OR LOWER(t.type) = LOWER($2))
     AND ($3::date IS NULL OR t.created_at >= $3::date)
     AND ($4::date IS NULL OR t.created_at <= $4::date)
+    AND (fa.id=$5 OR ta.id=$5)
     ORDER BY t.created_at DESC 
-    LIMIT $5
+    LIMIT $6
 `;
 
 module.exports = {

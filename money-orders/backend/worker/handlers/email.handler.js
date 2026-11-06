@@ -10,6 +10,7 @@ async function handleEmail(job){
         !type || type === "all" ? null : type,
         fromDate || null,
         toDate || null,
+        user.accountId,
         limit
     );
 

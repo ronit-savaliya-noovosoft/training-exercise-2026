@@ -1,23 +1,6 @@
 const queries = require("../queries/account.queries");
 const db = require("../config/db");
-
-async function updateBalance(client, accountId, signedAmount){
-    const result = await client.query(queries.UPDATE_BALANCE, [signedAmount, accountId]);
-
-    if(result.rowCount===0){
-        const error = new Error("Account not found");
-        error.code = "ACCOUNT_NOT_FOUND";
-        throw error
-    }
-
-    return result.rowCount;
-}
-
-async function getAccountForUpdate(client, accountId){
-    const result = await client.query(queries.GET_ACCOUNT_FOR_UPDATE, [accountId]);
-
-    return result.rows[0] || null;
-}
+const accountQueries = require("../queries/account.queries");
 
 async function getCustomerAccounts(){
     const result = await db.query(queries.GET_CUSTOMER_ACCOUNTS);
@@ -25,8 +8,9 @@ async function getCustomerAccounts(){
     return result.rows;
 }
 
-async function getAccountBalance(custId){
-    const result = await db.query(queries.GET_ACCOUNT_BALANCE, [custId]);
+async function getAccountBalance(custId, accountId){
+    const result = await db.query(queries.GET_ACCOUNT_BALANCE,
+        [custId, accountId]);
 
     return result.rows[0] || null;
 }
@@ -43,11 +27,42 @@ async function getAccountDetails(client, accountId){
     return result.rows;
 }
 
+async function getMyAccounts(customerId){
+    const result = await db.query(queries.GET_ACCOUNTS_OF_CUSTOMER,
+        [customerId]);
+
+    return result.rows;
+}
+
+async function getAccountByCustomer(accountId, customerId){
+    const result = await db.query(queries.GET_ACCOUNT_OF_CUSTOMER,
+        [accountId, customerId]);
+
+    return result.rows[0];
+}
+
+async function createAccount(account_number, cust_id, balance){
+    return await db.query(
+        queries.CREATE_ACCOUNT,
+        [account_number, cust_id, balance]
+    );
+}
+
+async function getLastAccountNumber(){
+    const result = await db.query(
+        queries.GET_LAST_ACCOUNT_NO
+    );
+
+    return result.rows[0].max;
+}
+
 module.exports = {
-    updateBalance,
-    getAccountForUpdate,
     getCustomerAccounts,
     getAccountBalance,
     getAccountDetails,
-    getAccountBalanceByAccountId
+    getAccountBalanceByAccountId,
+    getMyAccounts,
+    getAccountByCustomer,
+    createAccount,
+    getLastAccountNumber
 };

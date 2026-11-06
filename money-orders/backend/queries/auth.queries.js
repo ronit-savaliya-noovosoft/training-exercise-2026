@@ -22,6 +22,7 @@ const GET_CUSTOMER_PROFILE = `
     JOIN ACCOUNTS a
     ON a.cust_id = u.id
     WHERE u.id = $1
+    AND a.id = $2
 `;
 
 const GET_USER_PROFILE = `
@@ -40,16 +41,10 @@ const CHECK_EMAIL = `
     LIMIT 1
 `;
 
-const GET_LAST_ACCOUNT_NO = `
-    SELECT MAX(account_number)
-    FROM ACCOUNTS    
-`;
-
 module.exports = {
     LOGIN_USER,
     CREATE_CUSTOMER,
     GET_CUSTOMER_PROFILE,
     GET_USER_PROFILE,
     CHECK_EMAIL,
-    GET_LAST_ACCOUNT_NO
 };

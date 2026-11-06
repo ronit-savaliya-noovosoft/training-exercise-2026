@@ -10,9 +10,7 @@ async function login(req, res){
             });
         }
 
-        console.log(email);
         const result = await authService.login(email, password);
-        console.log(result);
 
         if(!result){
             return res.status(401).json({

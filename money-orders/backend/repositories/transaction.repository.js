@@ -27,8 +27,9 @@ function getVisibilityFilter(user){
     }
 
     return {
-        sql: "(sender.id = $1 OR receiver.id = $1)",
-        params: [Number(user.id)]
+        sql: `(sender.id = $1 OR receiver.id = $1)
+            AND (fa.id = $2 OR ta.id = $2)`,
+        params: [Number(user.id), Number(user.activeAccountId)]
     }
 }
 
@@ -43,7 +44,7 @@ async function getTransactionHistory(user, { limit, offset }){
     const result = await db.query(
         `${queries.GET_TRANSACTION_HISTORY_PREFIX}${filter.sql}
         ORDER BY t.created_at DESC
-        LIMIT $2 OFFSET $3`,
+        LIMIT $${filter.params.length+1} OFFSET $${filter.params.length+2}`,
         [...filter.params, limit, offset]
     );
 
@@ -61,22 +62,21 @@ async function getTransactionHistory(user, { limit, offset }){
     }
 }
 
-async function getTransactionsForEmail(customerId, type, fromDate, toDate, limit){
+async function getTransactionsForEmail(customerId, type, fromDate, toDate, accountId, limit){
     const result = await db.query(
         queries.GET_TRANSACTIONS_FOR_EMAIL,
-        [customerId, type, fromDate, toDate, limit]
+        [customerId, type, fromDate, toDate, accountId, limit]
     );
 
     return result.rows;
 }
 
-async function getAccountByCustomerId(custId){
+async function getAccountByCustomerId(custId, accountId){
     const result = await db.query(
-        accountQueries.GET_ACCOUNT_BY_CUSTOMER_ID,
-        [custId]
+        accountQueries.GET_ACCOUNT_OF_CUSTOMER,
+        [accountId, custId]
     );
 
-    console.log(result.rows[0]);
     return result.rows[0].id;
 }
 
