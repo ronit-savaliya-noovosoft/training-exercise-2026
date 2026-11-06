@@ -24,9 +24,21 @@ login.addEventListener('click', async function login(e) {
         const data = await logIn(email, password);
 
         if (data.status === "success") {
-            window.location.href = data.user.role ==="admin"
-                ? '../../../job/pages/html/admin_dashboard.html'
-                : '../../../dashboard/pages/html/dashboard.html';
+            // window.location.href = data.user.role ==="admin"
+            //     ? '../../../job/pages/html/admin_dashboard.html'
+            //     : '../../../dashboard/pages/html/dashboard.html';
+
+            switch (data.user.role){
+                case "admin":
+                    window.location.href = '../../../job/pages/html/admin_dashboard.html';
+                    break;
+                case "manager":
+                    window.location.href = '../../../dashboard/pages/html/dashboard.html';
+                    break;
+                case "customer":
+                    window.location.href = '../../pages/html/account.html';
+                    break;
+            }
             alert("Login successful!");
         }
         else {

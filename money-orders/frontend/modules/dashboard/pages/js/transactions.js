@@ -42,7 +42,7 @@ depositBtn.addEventListener('click', async function deposit(e) {
     const accountId = document.getElementById('select-deposit-to').value;
     const message = document.getElementById('deposit-message');
 
-    if (!await verifyAmount(amount, message, accountId)) {
+    if (!await verifyAmount(amount, message, accountId, 'deposit')) {
         return;
     }
 

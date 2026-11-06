@@ -59,10 +59,13 @@ export async function updateTransferToDropdown(user_data){
 }
 
 export async function showFilterMessage(user_data) {
+    const header_option = document.getElementById("account-section");
     if(user_data.role === "customer"){
         for(let i=0; i<=3; i++){
             common_message[i].replaceChildren();
         }
+    }else{
+        header_option.style.display = "none";
     }
 }
 

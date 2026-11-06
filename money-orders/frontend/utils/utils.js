@@ -1,7 +1,7 @@
 // Transactions Helper Function
 import {getBalanceOfSelectedCustomer} from "../modules/dashboard/services/accountService.js";
 
-async function verifyAmount(amount, element, accountId){
+async function verifyAmount(amount, element, accountId, type='withdraw'){
     if(amount===""){
         element.classList.remove('text-success');
         element.classList.add('text-danger');
@@ -17,7 +17,7 @@ async function verifyAmount(amount, element, accountId){
     else {
         const result = await getBalanceOfSelectedCustomer(accountId);
 
-        if(result.balance<amount){
+        if(result.balance<amount && type !== 'deposit'){
             element.classList.remove('text-success');
             element.classList.add('text-danger');
             element.textContent = "Insufficient Balance";
