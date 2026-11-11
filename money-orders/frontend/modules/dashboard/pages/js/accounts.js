@@ -7,10 +7,12 @@ const dropdowns = document.querySelectorAll('#select-deposit-to, #select-withdra
 const messages = document.querySelectorAll('#select-deposit-to-message, #select-withdraw-from-message, #select-transfer-to-message, #select-transfer-from-message');
 const common_message = document.getElementsByClassName('common-message');
 
+let currentAccountId = null;
 export async function fetchAndDisplayAccounts(user_data) {
     try {
         const result = await getAccounts();
         accounts = result.accounts;
+        currentAccountId = user_data.account_id;
 
         if(user_data.role === 'customer'){
             for(let i=0; i<=2; i++){
@@ -91,34 +93,61 @@ dropdowns[3].addEventListener('change', async () => {
 const accountBalance = document.getElementById('accountBalance');
 const toggleBalance = document.getElementById('toggleBalance');
 
+const verifyBalanceModel = bootstrap.Modal.getOrCreateInstance(
+    document.getElementById("verifyBalanceModal")
+);
+const verifyBalanceForm = document.getElementById("verifyBalanceForm");
+const balancePassword = document.getElementById("balancePassword");
+const message = document.getElementById("verify-balance-message");
+const resetBalance = document.getElementById("resetBalance");
+
 let balanceVisible = false;
 let currentBalance = null;
 toggleBalance.addEventListener('click', async () => {
-    const message = document.getElementById("verify-balance-message");
-    message.textContent = "";
 
     if(balanceVisible){
         accountBalance.textContent = "******";
         balanceVisible = false;
+        toggleBalance.textContent = "Show Balance";
+        resetBalance.classList.add("d-none");
         return;
     }
 
-    const password = prompt("Enter Password:");
+    message.textContent = "";
+    balancePassword.value = "";
+    verifyBalanceModel.show();
+});
 
-    if(!password){
-        console.log("Please enter password");
-        return;
-    }
+verifyBalanceForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const password = balancePassword.value;
 
     try{
         const result = await getAccountBalance(password);
         currentBalance = result.balance;
         accountBalance.textContent = currentBalance;
         balanceVisible = true;
+        resetBalance.classList.remove("d-none");
+        toggleBalance.textContent = "Hide Balance";
+
+        verifyBalanceModel.hide();
     }
     catch (e){
         message.textContent = e.message;
         message.classList.add("text-danger");
         console.log(e.message);
     }
+});
+
+resetBalance.addEventListener("click", async () => {
+    const result = await getBalanceOfSelectedCustomer(currentAccountId);
+
+    currentBalance = result.balance;
+    accountBalance.textContent = currentBalance;
+
+    balanceVisible = true;
+    toggleBalance.textContent = "Hide Balance";
+
+    resetBalance.classList.remove("d-none");
 });

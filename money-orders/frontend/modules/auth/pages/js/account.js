@@ -73,6 +73,11 @@ createAccountButton.addEventListener("click", async (e) => {
 
         if(result.status === "success"){
             await loadAccounts();
+
+            const modalElement = document.getElementById("accountSuccessModal");
+            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+
+            modal.show();
         }
     }
     catch (e){

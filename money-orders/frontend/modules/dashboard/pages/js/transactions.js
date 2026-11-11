@@ -83,6 +83,7 @@ withdrawBtn.addEventListener('click', async function withdraw(e) {
     try {
         const data = await withdrawFromAccount(accountId, amount);
 
+
         message.classList.remove('text-danger');
         message.classList.add('text-success');
         withdraw_amount.value = "";

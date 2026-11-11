@@ -17,7 +17,7 @@ async function verifyAmount(amount, element, accountId, type='withdraw'){
     else {
         const result = await getBalanceOfSelectedCustomer(accountId);
 
-        if(result.balance<amount && type !== 'deposit'){
+        if(Number(result.balance)<Number(amount) && type !== 'deposit'){
             element.classList.remove('text-success');
             element.classList.add('text-danger');
             element.textContent = "Insufficient Balance";
