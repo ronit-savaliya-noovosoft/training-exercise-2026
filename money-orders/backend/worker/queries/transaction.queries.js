@@ -39,6 +39,7 @@ const GET_ACCOUNTS_FOR_UPDATE = `
         balance
     FROM ACCOUNTS
     WHERE id = ANY($1)
+    AND is_active = true
     FOR UPDATE
 `;
 

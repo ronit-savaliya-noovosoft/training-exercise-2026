@@ -11,6 +11,7 @@ router.post("/get-balance", authenticateToken, authorizeRole("customer", "manage
 router.get("/my-accounts", authenticateToken, authorizeRole("customer"), accountController.getMyAccounts);
 router.post("/select", authenticateToken, authorizeRole("customer"), accountController.selectAccount);
 router.post("/create-account", authenticateToken, authorizeRole("customer"), accountController.createAccount);
-
+router.post("/deactivate-account", authenticateToken, authorizeRole("customer", "manager"), accountController.deactivateAccount);
+router.get("/all-accounts", authenticateToken, authorizeRole("manager"), accountController.getAllAccounts);
 
 module.exports = router;

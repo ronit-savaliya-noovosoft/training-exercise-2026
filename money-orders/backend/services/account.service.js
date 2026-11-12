@@ -2,6 +2,7 @@ const accountRepository = require("../repositories/account.repository");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const db = require("../config/db");
+const jobRepository = require("../repositories/job.repository");
 
 async function getCustomerAccounts(){
     return await accountRepository.getCustomerAccounts();
@@ -82,11 +83,37 @@ async function createAccount(user){
     }
 }
 
+async function deactivateAccount(user, accountId){
+    return await accountRepository.deactivateAccount(accountId, user.id);
+}
+
+async function getAllAccounts(query){
+    const page = Math.max(1, parseInt(query.page, 10) || 1);
+    const limit = Math.max(10, parseInt(query.limit) || 1);
+    const offset = (page-1) * limit;
+
+    const accounts = await accountRepository.getAllAccounts(limit, offset);
+    const total = await accountRepository.countAccounts();
+
+    return {
+        status: "success",
+        accounts,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total/limit)
+        }
+    }
+}
+
 module.exports = {
     getCustomerAccounts,
     getAccountBalance,
     getBalanceOfSelectedCustomer,
     getMyAccounts,
     selectAccount,
-    createAccount
+    createAccount,
+    deactivateAccount,
+    getAllAccounts
 };

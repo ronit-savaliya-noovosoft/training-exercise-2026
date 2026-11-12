@@ -56,6 +56,28 @@ async function getLastAccountNumber(){
     return result.rows[0].max;
 }
 
+async function deactivateAccount(account_id, customer_id){
+    return await db.query(
+        queries.DEACTIVATE_ACCOUNT,
+        [account_id, customer_id]
+    );
+}
+
+async function getAllAccounts(limit = 10, offset = 0){
+    const result = await db.query(queries.GET_ALL_ACCOUNTS,
+        [limit, offset]);
+
+    console.log(result);
+
+    return result.rows;
+}
+
+async function countAccounts(){
+    const result = await db.query(queries.COUNT_ACCOUNTS);
+
+    return result.rows[0].total;
+}
+
 module.exports = {
     getCustomerAccounts,
     getAccountBalance,
@@ -64,5 +86,8 @@ module.exports = {
     getMyAccounts,
     getAccountByCustomer,
     createAccount,
-    getLastAccountNumber
+    getLastAccountNumber,
+    deactivateAccount,
+    getAllAccounts,
+    countAccounts
 };

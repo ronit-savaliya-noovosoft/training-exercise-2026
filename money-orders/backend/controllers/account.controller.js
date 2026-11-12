@@ -1,4 +1,5 @@
 const accountService = require("../services/account.service");
+const jobService = require("../services/job.service");
 
 async function getCustomerAccounts(req, res){
     try{
@@ -112,11 +113,45 @@ async function createAccount(req, res){
     }
 }
 
+async function deactivateAccount(req, res){
+    try{
+        const { accountId } = req.body;
+
+        await accountService.deactivateAccount(
+            req.user,
+            accountId
+        );
+
+        return res.status(200).json({
+            status: "success",
+            message: "account deactivated successfully",
+        });
+    }
+    catch (e){
+        return res.status(500).json({
+            message: "Failed to deactivate an account"
+        });
+    }
+}
+
+async function getAllAccounts(req, res){
+    try{
+        return res.json(await accountService.getAllAccounts(req.query));
+    }
+    catch (e) {
+        return res.status(500).json({
+            message: "Failed to deactivate an account"
+        });
+    }
+}
+
 module.exports = {
     getCustomerAccounts,
     getAccountBalance,
     getBalanceOfSelectedCustomer,
     getMyAccounts,
     selectAccount,
-    createAccount
+    createAccount,
+    deactivateAccount,
+    getAllAccounts
 };

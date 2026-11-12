@@ -1,16 +1,3 @@
-const UPDATE_BALANCE = `
-    UPDATE accounts
-    SET balance = balance + $1
-    WHERE id = $2
-`;
-
-const GET_ACCOUNT_FOR_UPDATE = `
-    SELECT id, balance
-    FROM accounts 
-    WHERE id = $1
-    FOR UPDATE 
-`;
-
 const CREATE_ACCOUNT = `
     INSERT INTO ACCOUNTS (account_number, cust_id, balance)
     VALUES ($1, $2, $3)   
@@ -22,6 +9,7 @@ const GET_CUSTOMER_ACCOUNTS = `
              JOIN ACCOUNTS a
                   ON u.id = a.cust_id
     WHERE role='customer'
+    AND a.is_active = true
     ORDER BY u.name
 `;
 
@@ -56,6 +44,7 @@ const GET_ACCOUNTS_OF_CUSTOMER = `
     JOIN users u 
     ON u.id=a.cust_id
     WHERE u.id = $1
+    AND a.is_active = true
 `;
 
 const GET_ACCOUNT_OF_CUSTOMER = `
@@ -69,9 +58,29 @@ const GET_LAST_ACCOUNT_NO = `
     FROM ACCOUNTS    
 `;
 
+const DEACTIVATE_ACCOUNT = `
+    UPDATE ACCOUNTS
+    SET is_active = NOT is_active
+    WHERE id = $1
+    AND cust_id = $2
+`;
+
+// All active and deactivate accounts
+const GET_ALL_ACCOUNTS = `
+    SELECT a.account_number, u.name, u.email, a.created_at, a.is_active
+    FROM ACCOUNTS a
+    JOIN USERS u
+    ON a.cust_id = u.id
+    LIMIT $1
+    OFFSET $2
+`;
+
+const COUNT_ACCOUNTS = `
+    SELECT COUNT(*) AS total
+    FROM ACCOUNTS
+`;
+
 module.exports = {
-    UPDATE_BALANCE,
-    GET_ACCOUNT_FOR_UPDATE,
     CREATE_ACCOUNT,
     GET_CUSTOMER_ACCOUNTS,
     GET_ACCOUNT_BALANCE,
@@ -79,5 +88,8 @@ module.exports = {
     GET_ACCOUNT_DETAILS,
     GET_ACCOUNTS_OF_CUSTOMER,
     GET_ACCOUNT_OF_CUSTOMER,
-    GET_LAST_ACCOUNT_NO
+    GET_LAST_ACCOUNT_NO,
+    DEACTIVATE_ACCOUNT,
+    GET_ALL_ACCOUNTS,
+    COUNT_ACCOUNTS
 };
