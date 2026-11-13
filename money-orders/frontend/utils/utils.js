@@ -58,4 +58,14 @@ function flattenObject(ob){
     return result;
 }
 
-export { verifyAmount, titleCase, flattenObject };
+function debounce(func, delay = 400) {
+    let timeoutId;
+    return (...args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+    };
+}
+
+export { verifyAmount, titleCase, flattenObject, debounce };

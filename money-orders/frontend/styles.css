@@ -59,6 +59,22 @@ nav{
     display: none;
 }
 
+.account-tooltip{
+    --bs-tooltip-bg: #212529;
+    --bs-tooltip-color: #fff;
+    --bs-tooltip-padding-x: 14px;
+    --bs-tooltip-padding-y: 10px;
+    --bs-tooltip-border-radius: 8px;
+    --bs-tooltip-font-size: 13px;
+    --bs-tooltip-opacity: 1;
+}
+
+.account-tooltip .tooltip-inner{
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 @media (min-width: 768px) {
     header{
         flex-direction: row;

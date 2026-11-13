@@ -118,7 +118,6 @@ async function deactivateAccount(req, res){
         const { accountId } = req.body;
 
         await accountService.deactivateAccount(
-            req.user,
             accountId
         );
 
@@ -136,11 +135,16 @@ async function deactivateAccount(req, res){
 
 async function getAllAccounts(req, res){
     try{
-        return res.json(await accountService.getAllAccounts(req.query));
+        const result = await accountService.getAllAccounts(req.query);
+
+        console.log(result);
+
+        return res.json(result);
     }
     catch (e) {
+        console.log(e);
         return res.status(500).json({
-            message: "Failed to deactivate an account"
+            message: e.message
         });
     }
 }

@@ -62,16 +62,29 @@ const DEACTIVATE_ACCOUNT = `
     UPDATE ACCOUNTS
     SET is_active = NOT is_active
     WHERE id = $1
-    AND cust_id = $2
 `;
 
 // All active and deactivate accounts
 const GET_ALL_ACCOUNTS = `
-    SELECT a.account_number, u.name, u.email, a.created_at, a.is_active
+    SELECT
+        a.id AS id,
+        a.account_number,
+        a.balance,
+        u.name,
+        u.email,
+        a.created_at,
+        a.is_active,
+        COUNT(*) OVER() AS total
     FROM ACCOUNTS a
-    JOIN USERS u
-    ON a.cust_id = u.id
-    LIMIT $1
+             JOIN USERS u ON a.cust_id = u.id
+    WHERE (
+              $3::text IS NULL 
+              OR a.account_number ILIKE '%' || $3 || '%'
+              OR u.name ILIKE '%' || $3 || '%'
+              OR u.email ILIKE '%' || $3 || '%'
+              )
+    ORDER BY a.created_at DESC
+        LIMIT $1
     OFFSET $2
 `;
 

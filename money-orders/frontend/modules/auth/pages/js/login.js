@@ -36,7 +36,7 @@ login.addEventListener('click', async function login(e) {
                     window.location.href = '../../../dashboard/pages/html/dashboard.html';
                     break;
                 case "customer":
-                    window.location.href = '../../pages/html/account.html';
+                    window.location.href = '../../../account/pages/html/selectAccount.html';
                     break;
             }
             alert("Login successful!");

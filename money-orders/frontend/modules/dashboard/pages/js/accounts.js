@@ -62,11 +62,17 @@ export async function updateTransferToDropdown(user_data){
 
 export async function showFilterMessage(user_data) {
     const header_option = document.getElementById("account-section");
+    const handle_accounts = document.getElementById("handle-accounts");
     if(user_data.role === "customer"){
+        handle_accounts.style.display = "none";
+
         for(let i=0; i<=3; i++){
             common_message[i].replaceChildren();
         }
+    }else if(user_data.role === "manager"){
+        header_option.style.display = "none";
     }else{
+        handle_accounts.style.display = "none";
         header_option.style.display = "none";
     }
 }

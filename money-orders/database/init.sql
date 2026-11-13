@@ -88,13 +88,27 @@ FROM ACCOUNTS;
 DELETE FROM ACCOUNTS
 WHERE account_number = 'NaN';
 
-DELETE FROM USERS
-WHERE id = 19;
+DELETE FROM TRANSACTIONS
+WHERE transactions.status = 'pending';
 
 ALTER TABLE USERS
 ADD CONSTRAINT users_role_check CHECK (role IN ('customer', 'manager', 'admin'));
 
 
+-- Add active column
+ALTER TABLE ACCOUNTS
+ADD is_active BOOLEAN DEFAULT true;
+
+UPDATE ACCOUNTS
+SET is_active = true
+WHERE is_active IS NULL;
+
+
 SELECT CURRENT_TIMESTAMP;
 
 SELECT current_database() AS database;
+
+UPDATE ACCOUNTS
+SET is_active = NOT is_active
+WHERE id = 2
+  AND cust_id = 3;

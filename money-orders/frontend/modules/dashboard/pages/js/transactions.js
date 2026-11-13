@@ -171,12 +171,29 @@ export async function fetchTransactionHistory(page = 1) {
             transactions.innerHTML = result.transactions.map(item => `
                     <tr>
                         <td>${titleCase(item.type)}</td>
-                        <td>${item.sender || "-"}</td>
-                        <td>${item.receiver || "-"}</td>
+                        <td>
+                            <span data-bs-toggle="tooltip"
+                               data-bs-placement="top"
+                               data-bs-custom-class="account-tooltip"
+                               title="${item.from_account_number}"
+                               style="cursor: pointer;">${item.sender || "-"}</span>
+                        </td>
+                        <td>
+                            <span data-bs-toggle="tooltip"
+                               data-bs-placement="top"
+                               data-bs-custom-class="account-tooltip"
+                               title="${item.to_account_number}"
+                               style="cursor: pointer;">${item.receiver || "-"}</span>
+                        </td>
                         <td class="">${item.amount}</td>
                         <td><span class="badge center rounded-pill ${item.status === 'completed' ? 'bg-success' : (item.status === 'failed' ? 'bg-danger' : 'bg-warning')}">${item.status}</span></td>
                     </tr>
                 `).join('');
+
+
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(element => {
+                new bootstrap.Tooltip(element);
+            });
 
             renderPagination({
                 container: pagination,

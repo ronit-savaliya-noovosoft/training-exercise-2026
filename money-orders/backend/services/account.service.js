@@ -83,8 +83,8 @@ async function createAccount(user){
     }
 }
 
-async function deactivateAccount(user, accountId){
-    return await accountRepository.deactivateAccount(accountId, user.id);
+async function deactivateAccount(accountId){
+    return await accountRepository.deactivateAccount(accountId);
 }
 
 async function getAllAccounts(query){
@@ -92,8 +92,10 @@ async function getAllAccounts(query){
     const limit = Math.max(10, parseInt(query.limit) || 1);
     const offset = (page-1) * limit;
 
-    const accounts = await accountRepository.getAllAccounts(limit, offset);
-    const total = await accountRepository.countAccounts();
+    const accounts = await accountRepository.getAllAccounts(limit, offset, query.search) || [];
+    // const total = await accountRepository.countAccounts();
+
+    const total = Number(accounts[0]?.total ?? 0);
 
     return {
         status: "success",
@@ -102,7 +104,7 @@ async function getAllAccounts(query){
             page,
             limit,
             total,
-            totalPages: Math.ceil(total/limit)
+            totalPages: (Math.ceil(total/limit))
         }
     }
 }

@@ -56,18 +56,16 @@ async function getLastAccountNumber(){
     return result.rows[0].max;
 }
 
-async function deactivateAccount(account_id, customer_id){
+async function deactivateAccount(account_id){
     return await db.query(
         queries.DEACTIVATE_ACCOUNT,
-        [account_id, customer_id]
+        [account_id]
     );
 }
 
-async function getAllAccounts(limit = 10, offset = 0){
+async function getAllAccounts(limit = 10, offset = 0, search = null){
     const result = await db.query(queries.GET_ALL_ACCOUNTS,
-        [limit, offset]);
-
-    console.log(result);
+        [limit, offset, search]);
 
     return result.rows;
 }

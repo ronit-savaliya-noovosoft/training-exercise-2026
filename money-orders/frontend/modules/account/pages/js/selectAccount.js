@@ -1,8 +1,9 @@
 import {
     createAccount,
     getMyAccounts,
-    selectAccount as selectAccountAPI
-} from "../../services/accountService.js";
+    selectAccount as selectAccountAPI,
+    deactivateAccount as deactivateAccountAPI
+} from "../../../account/services/accountService.js";
 
 const accountsContainer = document.getElementById("accounts");
 const message = document.getElementById("accountMessage");
@@ -28,7 +29,10 @@ export async function loadAccounts(){
                 <h4>Account Number: ${account.account_number}</h4>
                 <h6 class="text-secondary">Account Holder: ${account.name}</h6>
                 <p>Balance: ${account.balance}</p>
-                <button class="btn btn-primary" data-account-id="${account.id}">Select Account</button>
+                <div class="d-flex gap-3">
+                    <button class="btn btn-primary" data-account-id="${account.id}">Select Account</button>
+                    <button class="btn btn-outline-danger" data-deactivate-id="${account.id}">Deactivate</button>
+                </div>
             </div>
         `).join("");
 
@@ -85,4 +89,50 @@ createAccountButton.addEventListener("click", async (e) => {
         message.classList.add('text-danger');
         message.textContent = e.message;
     }
+});
+
+const deactivateModal = bootstrap.Modal.getOrCreateInstance(
+    document.getElementById("deactivateAccountModal")
+);
+
+const confirmDeactivate = document.getElementById("confirmDeactivate");
+const deactivateAccountMessage = document.getElementById("deactivateAccountMessage");
+
+let selectedAccountId = null;
+
+accountsContainer.addEventListener("click", (e) => {
+    const button = e.target.closest("[data-deactivate-id]");
+
+    if(!button){
+        return;
+    }
+
+    selectedAccountId = button.dataset.deactivateId;
+
+    deactivateAccountMessage.textContent = "";
+    deactivateModal.show();
+});
+
+confirmDeactivate.addEventListener("click", async () => {
+   try{
+       confirmDeactivate.disabled = true;
+       confirmDeactivate.textContent ="Deactivating...";
+
+       const result = await deactivateAccountAPI(selectedAccountId);
+
+       if(result.status === "success"){
+           deactivateModal.hide();
+           selectedAccountId = null;
+
+           await loadAccounts();
+       }
+   }
+   catch (e){
+       deactivateAccountMessage.textContent = e.message;
+       deactivateAccountMessage.classList.add("text-danger");
+   }
+   finally {
+       confirmDeactivate.disabled = false;
+       confirmDeactivate.textContent = "Deactivate";
+   }
 });
