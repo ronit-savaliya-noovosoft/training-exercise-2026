@@ -1,5 +1,11 @@
 import {renderPagination, updatePaginationInfo} from "../../../../utils/pagination.js";
-import {deactivateAccount as deactivateAccountAPI, getAllAccounts} from "../../services/accountService.js";
+import {
+    cancelAccountRequest,
+    createAccount,
+    deactivateAccount as deactivateAccountAPI,
+    getAllAccounts,
+    getPendingAccountRequests
+} from "../../services/accountService.js";
 import {debounce} from "../../../../utils/utils.js";
 
 const accounts = document.getElementById('accounts');
@@ -116,3 +122,102 @@ const debouncedSearch = debounce(() => {
 }, 400);
 
 searchInput.addEventListener('input', debouncedSearch);
+
+
+const pendingRequestsModal = document.getElementById("pendingRequestsModal");
+const pendingRequestsTable = document.getElementById("pendingRequestsTable");
+const pendingRequestsMessage = document.getElementById("pendingRequestsMessage");
+
+
+async function loadPendingRequests(){
+    console.log(pendingRequestsTable)
+    try{
+        pendingRequestsTable.innerHTML = `
+            <tr>
+                <td colspan="3" class="text-center">Loading Requests...</td>
+            </tr>
+        `;
+
+        pendingRequestsMessage.textContent = "";
+        const result = await getPendingAccountRequests();
+
+
+        if(result.status !== "success"){
+            throw new Error(result.message || "Unable to fetch requests");
+        }
+
+        if(result.requests.length === 0){
+            pendingRequestsTable.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center text-muted py-4">No pending requests found.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        pendingRequestsTable.innerHTML = "";
+
+        result.requests.forEach(request => {
+           const row = document.createElement("tr");
+
+           const nameCell = document.createElement("td");
+           nameCell.textContent = request.data.name;
+
+           const emailCell = document.createElement("td");
+           emailCell.textContent = request.data.email;
+
+           const actionCell = document.createElement("td");
+           actionCell.className = "text-center";
+           actionCell.innerHTML = `
+                <button class="btn btn-sm btn-success" data-action="approve" data-user-id="${Number(request.data.userId)}" data-request-id="${Number(request.id)}">Approve</button>
+                <button class="btn btn-sm btn-outline-danger" data-action="cancel" data-request-id="${Number(request.id)}">Cancel</button>
+           `;
+
+           row.append(nameCell, emailCell, actionCell);
+
+           pendingRequestsTable.appendChild(row);
+        });
+    }
+    catch (e) {
+        pendingRequestsTable.innerHTML = `
+            <tr>
+                <td colspan="3" class="text-center text-danger">${e.message}</td>
+            </tr>
+        `;
+    }
+}
+
+pendingRequestsModal.addEventListener("show.bs.modal", ()=>{
+    loadPendingRequests();
+});
+
+pendingRequestsTable.addEventListener("click", async (e) => {
+   const button = e.target.closest("[data-action]");
+
+   if(!button){
+       return;
+   }
+
+   const action = button.dataset.action;
+   const requestId = button.dataset.requestId;
+
+   try{
+       button.disabled = true;
+
+       if(action === "approve"){
+           const userId = button.dataset.userId;
+
+           await createAccount(userId, requestId);
+       }
+       else if(action === "cancel"){
+           await cancelAccountRequest(requestId);
+       }
+
+       await loadPendingRequests();
+   }
+   catch (e){
+       pendingRequestsMessage.classList.add("text-danger");
+       pendingRequestsMessage.textContent = e.message;
+       button.disabled = false;
+   }
+});

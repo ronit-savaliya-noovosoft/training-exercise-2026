@@ -97,7 +97,7 @@ async function selectAccount(req, res, next){
 async function createAccount(req, res){
     try{
         const result = await accountService.createAccount(
-            req.user
+            req.body
         );
 
         return res.status(200).json({
@@ -136,13 +136,56 @@ async function deactivateAccount(req, res){
 async function getAllAccounts(req, res){
     try{
         const result = await accountService.getAllAccounts(req.query);
-
-        console.log(result);
-
         return res.json(result);
     }
     catch (e) {
         console.log(e);
+        return res.status(500).json({
+            message: e.message
+        });
+    }
+}
+
+async function createRequestForAccountCreation(req, res){
+    try{
+        const result = await accountService.createRequestForAccountCreation(req.user);
+        return res.json(result);
+    }
+    catch (e) {
+        console.log(e);
+        return res.status(500).json({
+            message: e.message
+        });
+    }
+}
+
+async function getPendingAccountRequests(req, res){
+    try{
+        const requests = await accountService.getPendingAccountRequests();
+
+        return res.status(200).json({
+            status: "success",
+            message: "Pending Requests fetched successfully",
+            requests
+        });
+    }
+    catch (e) {
+        return res.status(500).json({
+            message: e.message
+        });
+    }
+}
+
+async function cancelRequest(req, res){
+    try{
+        await accountService.cancelRequest(req.body.requestId);
+
+        return res.status(200).json({
+            status: "success",
+            message: "request cancel successfully",
+        });
+    }
+    catch (e) {
         return res.status(500).json({
             message: e.message
         });
@@ -157,5 +200,8 @@ module.exports = {
     selectAccount,
     createAccount,
     deactivateAccount,
-    getAllAccounts
+    getAllAccounts,
+    createRequestForAccountCreation,
+    getPendingAccountRequests,
+    cancelRequest
 };

@@ -37,6 +37,15 @@ CREATE TABLE JOBS (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE REQUESTS(
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(255) NOT NULL,
+    data JSONB NOT NULL DEFAULT '{}'::jsonb,
+    status VARCHAR(255) NOT NULL DEFAULT 'pending' CHECK ( status IN ('pending', 'cancelled', 'approved') ),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 INSERT INTO accounts (account_number, cust_id, balance)
 VALUES ('4321 8765 0987 6545', 3, 5000);
 
@@ -81,6 +90,7 @@ SELECT * FROM ACCOUNTS;
 SELECT * FROM USERS;
 SELECT * FROM JOBS
 ORDER BY id;
+SELECT * FROM REQUESTS;
 
 SELECT MAX(account_number)
 FROM ACCOUNTS;

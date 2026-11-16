@@ -2,7 +2,7 @@ import {
     createAccount,
     getMyAccounts,
     selectAccount as selectAccountAPI,
-    deactivateAccount as deactivateAccountAPI
+    deactivateAccount as deactivateAccountAPI, createAccountCreationRequest
 } from "../../../account/services/accountService.js";
 
 const accountsContainer = document.getElementById("accounts");
@@ -10,6 +10,8 @@ const message = document.getElementById("accountMessage");
 
 export async function loadAccounts(){
     try{
+        message.textContent = "";
+
         const result = await getMyAccounts();
 
         if(result.status!=="success"){
@@ -73,7 +75,7 @@ const createAccountButton = document.getElementById("create-account");
 createAccountButton.addEventListener("click", async (e) => {
     const message = document.getElementById("createAccountMessage");
     try{
-        const result = await createAccount();
+        const result = await createAccountCreationRequest();
 
         if(result.status === "success"){
             await loadAccounts();

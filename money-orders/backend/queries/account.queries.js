@@ -88,9 +88,28 @@ const GET_ALL_ACCOUNTS = `
     OFFSET $2
 `;
 
-const COUNT_ACCOUNTS = `
-    SELECT COUNT(*) AS total
-    FROM ACCOUNTS
+const INSERT_REQUEST_FOR_ACCOUNT_CREATION = `
+    INSERT INTO REQUESTS (type, data)
+    VALUES ('account', $1)
+    RETURNING *
+`;
+
+const GET_PENDING_ACCOUNT_REQUESTS = `
+    SELECT id, data
+    FROM REQUESTS
+    WHERE status = 'pending'
+`;
+
+const UPDATE_REQUEST_STATUS_APPROVED = `
+    UPDATE REQUESTS
+    SET status = 'approved'
+    WHERE id = $1
+`;
+
+const UPDATE_REQUEST_STATUS_CANCELLED = `
+    UPDATE REQUESTS
+    SET status = 'cancelled'
+    WHERE id = $1
 `;
 
 module.exports = {
@@ -104,5 +123,8 @@ module.exports = {
     GET_LAST_ACCOUNT_NO,
     DEACTIVATE_ACCOUNT,
     GET_ALL_ACCOUNTS,
-    COUNT_ACCOUNTS
+    INSERT_REQUEST_FOR_ACCOUNT_CREATION,
+    GET_PENDING_ACCOUNT_REQUESTS,
+    UPDATE_REQUEST_STATUS_APPROVED,
+    UPDATE_REQUEST_STATUS_CANCELLED
 };

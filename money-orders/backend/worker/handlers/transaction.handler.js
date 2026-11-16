@@ -37,7 +37,8 @@ async function handleTransaction(job){
        const accounts = await transactionRepository.getAccountsForUpdate(client, accountIds);
 
        if(accounts.length !== new Set(accountIds).size){
-           await transactionRepository.markFailed();
+           await transactionRepository.markFailed(client, id);
+           return;
        }
 
        if(type === JOB_TYPE.DEPOSIT){

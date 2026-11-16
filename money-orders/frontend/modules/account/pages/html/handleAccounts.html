@@ -21,9 +21,48 @@
     </header>
     <main>
         <div>
-           <div class="m-3">
-               <label for="searchInput"><i class="bi bi-search m-2"></i></label>
-               <input type="text" class="w-50 p-1 border border-dark border-1 rounded" id="searchInput" placeholder="Name, email, or account number..." />
+           <div class="m-3 d-flex flex-row justify-content-between">
+               <div>
+                   <label for="searchInput"><i class="bi bi-search m-2"></i></label>
+                   <input type="text" class="w-75 p-1 border border-dark border-1 rounded" id="searchInput" placeholder="Name, email, or account number..." />
+               </div>
+               <div>
+                   <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pendingRequestsModal" id="pendingRequestsButton">Pending Requests</button>
+                   <div class="modal fade" id="pendingRequestsModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dilog-centerd modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Pending Account Requests</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div id="pendingRequestsMessage" class="mb-3"></div>
+
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle">
+                                            <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th class="text-center">Action</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="pendingRequestsTable">
+                                            <tr>
+                                                <td colspan="3" class="text-center">
+                                                    Loading requests...
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                   </div>
+               </div>
            </div>
             <div class="bg-light table-responsive m-3 border border-dark border-1 rounded">
                 <table class="table table-hover">

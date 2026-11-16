@@ -60,8 +60,9 @@ async function selectAccount(user, accountId){
     };
 }
 
-async function createAccount(user){
+async function createAccount(body){
     const client = await db.connect();
+    const { userId, requestId } = body;
 
     try{
         await client.query("BEGIN");
@@ -70,7 +71,9 @@ async function createAccount(user){
         const newAccountNo = Number(lastAccountNo.replaceAll(" ", ""))+1;
 
         const accountNumber = newAccountNo.toString().replace(/(.{4})/g, '$1 ').trim();
-        await accountRepository.createAccount(client, accountNumber, user.id, 0);
+        await accountRepository.createAccount(client, accountNumber, userId, 0);
+
+        await accountRepository.markApproved(client, requestId)
 
         await client.query("COMMIT");
     }
@@ -109,6 +112,34 @@ async function getAllAccounts(query){
     }
 }
 
+async function createRequestForAccountCreation(user){
+    try{
+        const request = await accountRepository.createRequestForAccountCreation({
+            userId: user.id,
+            name: user.name,
+            email: user.email
+        });
+
+        return {
+            status: "success",
+            message: "request for create account sent successfully",
+            request
+        }
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+async function getPendingAccountRequests(){
+    return await accountRepository.getPendingAccountRequests();
+}
+
+async function cancelRequest(requestId){
+    return await accountRepository.markCancelled(requestId);
+}
+
+
 module.exports = {
     getCustomerAccounts,
     getAccountBalance,
@@ -117,5 +148,8 @@ module.exports = {
     selectAccount,
     createAccount,
     deactivateAccount,
-    getAllAccounts
+    getAllAccounts,
+    createRequestForAccountCreation,
+    getPendingAccountRequests,
+    cancelRequest
 };

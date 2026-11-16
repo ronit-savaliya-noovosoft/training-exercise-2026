@@ -70,10 +70,30 @@ async function getAllAccounts(limit = 10, offset = 0, search = null){
     return result.rows;
 }
 
-async function countAccounts(){
-    const result = await db.query(queries.COUNT_ACCOUNTS);
+async function createRequestForAccountCreation(data){
+    const result = await db.query(queries.INSERT_REQUEST_FOR_ACCOUNT_CREATION, [data]);
 
-    return result.rows[0].total;
+    return result.rows[0];
+}
+
+async function getPendingAccountRequests(){
+    const result = await db.query(queries.GET_PENDING_ACCOUNT_REQUESTS);
+
+    return result.rows;
+}
+
+async function markApproved(client, requestId){
+    await client.query(
+        queries.UPDATE_REQUEST_STATUS_APPROVED,
+        [requestId]
+    );
+}
+
+async function markCancelled(requestId){
+    await db.query(
+        queries.UPDATE_REQUEST_STATUS_CANCELLED,
+        [requestId]
+    );
 }
 
 module.exports = {
@@ -87,5 +107,8 @@ module.exports = {
     getLastAccountNumber,
     deactivateAccount,
     getAllAccounts,
-    countAccounts
+    createRequestForAccountCreation,
+    getPendingAccountRequests,
+    markApproved,
+    markCancelled
 };
