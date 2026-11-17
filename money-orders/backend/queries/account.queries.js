@@ -102,14 +102,22 @@ const GET_PENDING_ACCOUNT_REQUESTS = `
 
 const UPDATE_REQUEST_STATUS_APPROVED = `
     UPDATE REQUESTS
-    SET status = 'approved'
+    SET status = 'approved',
+        updated_at = NOW()
     WHERE id = $1
 `;
 
 const UPDATE_REQUEST_STATUS_CANCELLED = `
     UPDATE REQUESTS
-    SET status = 'cancelled'
+    SET status = 'cancelled',
+        updated_at = NOW()
     WHERE id = $1
+`;
+
+const GET_REQUEST_BY_USER_ID = `
+    SELECT * FROM REQUESTS
+    WHERE (data ->> 'userId')::int = $1
+    ORDER BY created_at DESC
 `;
 
 module.exports = {
@@ -126,5 +134,6 @@ module.exports = {
     INSERT_REQUEST_FOR_ACCOUNT_CREATION,
     GET_PENDING_ACCOUNT_REQUESTS,
     UPDATE_REQUEST_STATUS_APPROVED,
-    UPDATE_REQUEST_STATUS_CANCELLED
+    UPDATE_REQUEST_STATUS_CANCELLED,
+    GET_REQUEST_BY_USER_ID
 };

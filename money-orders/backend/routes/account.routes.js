@@ -2,7 +2,6 @@ const express= require('express');
 const authenticateToken = require('../middlewares/auth.middleware');
 const accountController = require("../controllers/account.controller");
 const authorizeRole = require("../middlewares/role.middleware");
-const {createRequestForAccountCreation, getPendingAccountRequests, cancelRequest} = require("../controllers/account.controller");
 
 const router= express.Router();
 
@@ -14,8 +13,9 @@ router.post("/select", authenticateToken, authorizeRole("customer"), accountCont
 router.post("/create-account", authenticateToken, authorizeRole("manager"), accountController.createAccount);
 router.post("/deactivate-account", authenticateToken, authorizeRole("customer", "manager"), accountController.deactivateAccount);
 router.get("/all-accounts", authenticateToken, authorizeRole("manager"), accountController.getAllAccounts);
-router.post("/account-creation-request", authenticateToken, authorizeRole("customer"), createRequestForAccountCreation);
-router.get("/get-pending-account-requests", authenticateToken, authorizeRole("manager"), getPendingAccountRequests)
-router.post("/cancel-request", authenticateToken, authorizeRole("manager"), cancelRequest);
+router.post("/account-creation-request", authenticateToken, authorizeRole("customer"), accountController.createRequestForAccountCreation);
+router.get("/get-pending-account-requests", authenticateToken, authorizeRole("manager"), accountController.getPendingAccountRequests)
+router.post("/cancel-request", authenticateToken, authorizeRole("manager"), accountController.cancelRequest);
+router.get("/get-requests", authenticateToken, authorizeRole("customer"), accountController.getRequestsByUserId)
 
 module.exports = router;

@@ -8,3 +8,4 @@ export const DEACTIVATE_ACCOUNT = `${BASE_URL}${ACCOUNT}/deactivate-account`;
 export const REQUEST_FOR_CREATE_ACCOUNT = `${BASE_URL}${ACCOUNT}/account-creation-request`;
 export const GET_PENDING_REQUESTS = `${BASE_URL}${ACCOUNT}/get-pending-account-requests`;
 export const CANCEL_ACCOUNT_REQUEST = `${BASE_URL}${ACCOUNT}/cancel-request`;
+export const GET_REQUESTS_FOR_CUSTOMER = `${BASE_URL}${ACCOUNT}/get-requests`;

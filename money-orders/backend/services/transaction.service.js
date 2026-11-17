@@ -209,7 +209,8 @@ async function emailTransactionHistory(user, filters){
             type: type || "all",
             fromDate: fromDate || null,
             toDate: toDate || null
-        }
+        },
+        type: "TRANSACTIONS"
     };
 
     const client = await db.connect();

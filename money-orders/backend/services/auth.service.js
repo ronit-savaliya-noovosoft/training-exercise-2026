@@ -63,17 +63,17 @@ async function signup(name, email, password){
         // const min = 1000000000000000;
         // const max = 9999999999999999;
         // const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-
-        const lastAccountNo = await accountRepository.getLastAccountNumber();
-        const newAccountNo = Number(lastAccountNo.replaceAll(" ", ""))+1;
-
-        if(isNaN(newAccountNo)){
-            await client.query("ROLLBACK");
-            return;
-        }
-
-        const accountNumber = newAccountNo.toString().replace(/(.{4})/g, '$1 ').trim();
-        await accountRepository.createAccount(client, accountNumber, customerId, 0);
+        //
+        // const lastAccountNo = await accountRepository.getLastAccountNumber();
+        // const newAccountNo = Number(lastAccountNo.replaceAll(" ", ""))+1;
+        //
+        // if(isNaN(newAccountNo)){
+        //     await client.query("ROLLBACK");
+        //     return;
+        // }
+        //
+        // const accountNumber = newAccountNo.toString().replace(/(.{4})/g, '$1 ').trim();
+        // await accountRepository.createAccount(client, accountNumber, customerId, 0);
 
         await client.query("COMMIT");
     }

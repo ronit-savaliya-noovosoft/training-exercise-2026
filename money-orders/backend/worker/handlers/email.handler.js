@@ -1,7 +1,8 @@
 const transactionRepository = require("../../repositories/transaction.repository");
+const authRepository = require("../../repositories/auth.repository");
 const transporter = require("../../config/email");
 
-async function handleEmail(job){
+async function handleTransactionEmail(job){
     const { user, filters } = job.data;
     const { limit = 10, type, fromDate, toDate } = filters;
 
@@ -64,4 +65,45 @@ async function handleEmail(job){
     });
 }
 
-module.exports = { handleEmail };
+async function handleAccountEmail(job){
+    const { account } = job.data;
+
+    const customer = await authRepository.getUserProfile(account.holderId);
+    console.log(customer);
+    let html;
+
+    if(account.status==="approved"){
+        html = `
+            <h3>Dear ${customer.name || "Customer"},</h3>
+            <p>Your request for account creation is approved, you can check you account now.</p>
+            <p>Approved by your bank manager, ${account.managerName || ""}</p>
+            <br />
+            <h4>Account Details</h4>
+            <ul>
+                <li>Account Holder: ${customer.name}</li>
+                <li>Account Number: ${account.accountNumber || "**** **** **** ****"}</li>
+                <li>Email: ${customer.email}</li>
+            </ul>
+            <a href="http://localhost:8080/modules/account/pages/html/selectAccount.html">Accounts Link</a>
+        `;
+    }
+    else if(account.status==="cancelled"){
+        html = `
+            <h3>Dear ${customer.name},</h3>
+            <p>Due to some reason your account request has been cancelled, contact your back manager.</p>
+            <a href="http://localhost:8080/modules/account/pages/html/selectAccount.html">Accounts Link</a>
+        `;
+    }
+
+    await transporter.sendMail({
+        from: '"Banking App" <banking-app@localhost>',
+        to: customer.email,
+        subject: "Account Request",
+        html: html
+    });
+}
+
+module.exports = {
+    handleTransactionEmail,
+    handleAccountEmail
+};

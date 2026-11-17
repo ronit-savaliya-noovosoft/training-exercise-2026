@@ -2,7 +2,8 @@ const accountRepository = require("../repositories/account.repository");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const db = require("../config/db");
-const jobRepository = require("../repositories/job.repository");
+const jobsRepository = require("../worker/repositories/jobs.repository");
+const {JOB_TYPE} = require("../worker/constants/jobs.constants");
 
 async function getCustomerAccounts(){
     return await accountRepository.getCustomerAccounts();
@@ -60,7 +61,7 @@ async function selectAccount(user, accountId){
     };
 }
 
-async function createAccount(body){
+async function createAccount(user, body){
     const client = await db.connect();
     const { userId, requestId } = body;
 
@@ -70,15 +71,29 @@ async function createAccount(body){
         const lastAccountNo = await accountRepository.getLastAccountNumber();
         const newAccountNo = Number(lastAccountNo.replaceAll(" ", ""))+1;
 
+
         const accountNumber = newAccountNo.toString().replace(/(.{4})/g, '$1 ').trim();
         await accountRepository.createAccount(client, accountNumber, userId, 0);
 
-        await accountRepository.markApproved(client, requestId)
+        await accountRepository.markApproved(client, requestId);
+
+        const jobData = {
+            account: {
+                holderId: userId,
+                accountNumber: accountNumber,
+                managerName: user.name,
+                status: "approved"
+            },
+            type: "ACCOUNT"
+        }
+
+        await jobsRepository.createJob(client, JOB_TYPE.MAIL, jobData);
 
         await client.query("COMMIT");
     }
     catch (e) {
         await client.query("ROLLBACK");
+        console.log(e.message);
         throw e;
     }
     finally {
@@ -135,8 +150,40 @@ async function getPendingAccountRequests(){
     return await accountRepository.getPendingAccountRequests();
 }
 
-async function cancelRequest(requestId){
-    return await accountRepository.markCancelled(requestId);
+async function cancelRequest(userId, requestId){
+    const client = await db.connect();
+    try{
+        await client.query("BEGIN");
+        const request = await accountRepository.markCancelled(client, requestId);
+
+        console.log(userId);
+
+        const jobData = {
+            account: {
+                holderId: userId,
+                status: "cancelled"
+            },
+            type: "ACCOUNT"
+        }
+
+        await jobsRepository.createJob(client, JOB_TYPE.MAIL, jobData);
+
+        await client.query("COMMIT");
+
+        return request;
+    }
+    catch (e) {
+        await client.query("ROLLBACK");
+        console.log(e.message);
+        throw e;
+    }
+    finally {
+        await client.release();
+    }
+}
+
+async function getRequestsByUserId(user){
+    return await accountRepository.getRequestsByUserId(user.id);
 }
 
 
@@ -151,5 +198,6 @@ module.exports = {
     getAllAccounts,
     createRequestForAccountCreation,
     getPendingAccountRequests,
-    cancelRequest
+    cancelRequest,
+    getRequestsByUserId
 };

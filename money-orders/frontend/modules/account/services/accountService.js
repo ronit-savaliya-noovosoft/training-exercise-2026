@@ -6,7 +6,7 @@ import {
     SELECT_ACCOUNT,
     DEACTIVATE_ACCOUNT,
     REQUEST_FOR_CREATE_ACCOUNT,
-    GET_PENDING_REQUESTS, CANCEL_ACCOUNT_REQUEST
+    GET_PENDING_REQUESTS, CANCEL_ACCOUNT_REQUEST, GET_REQUESTS_FOR_CUSTOMER
 } from "../constants.js";
 
 
@@ -47,7 +47,11 @@ export async function getPendingAccountRequests(){
     return await apiRequest(`${GET_PENDING_REQUESTS}`, "GET");
 }
 
-export async function cancelAccountRequest(requestId){
+export async function cancelAccountRequest(userId, requestId){
     return await apiRequest(`${CANCEL_ACCOUNT_REQUEST}`, "POST",
-        { requestId });
+        { userId, requestId });
+}
+
+export async function getRequestsForCustomer(){
+    return await apiRequest(`${GET_REQUESTS_FOR_CUSTOMER}`, "GET");
 }

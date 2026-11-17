@@ -124,13 +124,13 @@ const debouncedSearch = debounce(() => {
 searchInput.addEventListener('input', debouncedSearch);
 
 
+// Pending Requests
 const pendingRequestsModal = document.getElementById("pendingRequestsModal");
 const pendingRequestsTable = document.getElementById("pendingRequestsTable");
 const pendingRequestsMessage = document.getElementById("pendingRequestsMessage");
 
 
 async function loadPendingRequests(){
-    console.log(pendingRequestsTable)
     try{
         pendingRequestsTable.innerHTML = `
             <tr>
@@ -155,28 +155,17 @@ async function loadPendingRequests(){
             return;
         }
 
-        pendingRequestsTable.innerHTML = "";
-
-        result.requests.forEach(request => {
-           const row = document.createElement("tr");
-
-           const nameCell = document.createElement("td");
-           nameCell.textContent = request.data.name;
-
-           const emailCell = document.createElement("td");
-           emailCell.textContent = request.data.email;
-
-           const actionCell = document.createElement("td");
-           actionCell.className = "text-center";
-           actionCell.innerHTML = `
-                <button class="btn btn-sm btn-success" data-action="approve" data-user-id="${Number(request.data.userId)}" data-request-id="${Number(request.id)}">Approve</button>
-                <button class="btn btn-sm btn-outline-danger" data-action="cancel" data-request-id="${Number(request.id)}">Cancel</button>
-           `;
-
-           row.append(nameCell, emailCell, actionCell);
-
-           pendingRequestsTable.appendChild(row);
-        });
+        console.log(result.requests);
+        pendingRequestsTable.innerHTML = result.requests.map(request => `
+                    <tr>
+                        <td>${request.data.name}</td>
+                        <td>${request.data.email}</td>
+                        <td class="text-center">
+                             <button class="btn btn-sm btn-success" data-action="approve" data-user-id="${Number(request.data.userId)}" data-request-id="${Number(request.id)}">Approve</button>
+                             <button class="btn btn-sm btn-outline-danger" data-action="cancel" data-user-id="${Number(request.data.userId)}" data-request-id="${Number(request.id)}">Cancel</button>
+                        </td>
+                    </tr>
+                `).join('');
     }
     catch (e) {
         pendingRequestsTable.innerHTML = `
@@ -198,19 +187,18 @@ pendingRequestsTable.addEventListener("click", async (e) => {
        return;
    }
 
-   const action = button.dataset.action;
-   const requestId = button.dataset.requestId;
+    const action = button.dataset.action;
+    const requestId = button.dataset.requestId;
+    const userId = button.dataset.userId;
 
-   try{
+    try{
        button.disabled = true;
 
        if(action === "approve"){
-           const userId = button.dataset.userId;
-
            await createAccount(userId, requestId);
        }
        else if(action === "cancel"){
-           await cancelAccountRequest(requestId);
+           await cancelAccountRequest(userId, requestId);
        }
 
        await loadPendingRequests();

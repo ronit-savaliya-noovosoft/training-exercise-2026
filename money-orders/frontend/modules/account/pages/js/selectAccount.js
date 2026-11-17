@@ -2,7 +2,8 @@ import {
     createAccount,
     getMyAccounts,
     selectAccount as selectAccountAPI,
-    deactivateAccount as deactivateAccountAPI, createAccountCreationRequest
+    deactivateAccount as deactivateAccountAPI, createAccountCreationRequest,
+    getRequestsForCustomer
 } from "../../../account/services/accountService.js";
 
 const accountsContainer = document.getElementById("accounts");
@@ -137,4 +138,66 @@ confirmDeactivate.addEventListener("click", async () => {
        confirmDeactivate.disabled = false;
        confirmDeactivate.textContent = "Deactivate";
    }
+});
+
+const requestsListModal = document.getElementById("requestsListModal");
+const requestsListTable = document.getElementById("requestsListTable");
+const requestsListMessage = document.getElementById("requestsListMessage");
+
+async function loadRequests(){
+    try{
+        requestsListTable.innerHTML = `
+            <tr>
+                <td colspan="3" class="text-center">Loading Requests...</td>
+            </tr>
+        `;
+
+        requestsListMessage.textContent = "";
+        const result = await getRequestsForCustomer();
+
+        if(result.status !== "success"){
+            throw new Error(result.message || "Unable to fetch requests");
+        }
+
+        if(result.requests.length === 0){
+            requestsListTable.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center text-muted py-4">No pending requests found.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        requestsListTable.innerHTML = "";
+
+        const options = {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        }
+
+        requestsListTable.innerHTML = result.requests.map(item => `
+                    <tr>
+                        <td>${new Date(item.created_at).toLocaleString('en-US', options)}
+                        </td>
+                        <td>${new Date(item.updated_at).toLocaleString('en-US', options)}
+                        </td>
+                        <td class="text-center"><span class="badge center rounded-pill ${item.status === 'approved' ? 'bg-success' : (item.status === 'cancelled' ? 'bg-danger' : 'bg-warning')}">${item.status}</span></td>
+                    </tr>
+                `).join('');
+    }
+    catch (e) {
+        requestsListTable.innerHTML = `
+            <tr>
+                <td colspan="3" class="text-center text-danger">${e.message}</td>
+            </tr>
+        `;
+    }
+}
+
+requestsListModal.addEventListener("show.bs.modal", ()=>{
+    loadRequests();
 });

@@ -89,12 +89,21 @@ async function markApproved(client, requestId){
     );
 }
 
-async function markCancelled(requestId){
-    await db.query(
+async function markCancelled(client, requestId){
+    await client.query(
         queries.UPDATE_REQUEST_STATUS_CANCELLED,
         [requestId]
     );
 }
+
+async function getRequestsByUserId(userId){
+    const result = await db.query(queries.GET_REQUEST_BY_USER_ID,
+        [userId]
+    );
+
+    return result.rows;
+}
+
 
 module.exports = {
     getCustomerAccounts,
@@ -110,5 +119,6 @@ module.exports = {
     createRequestForAccountCreation,
     getPendingAccountRequests,
     markApproved,
-    markCancelled
+    markCancelled,
+    getRequestsByUserId
 };

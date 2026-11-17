@@ -12,7 +12,12 @@ async function processJob(job){
                 await transactionHandler.handleTransaction(job);
                 break;
             case JOB_TYPE.MAIL:
-                await emailHandler.handleEmail(job);
+                if(job.data.type==='TRANSACTIONS'){
+                    await emailHandler.handleTransactionEmail(job);
+                }
+                else if(job.data.type==='ACCOUNT'){
+                    await emailHandler.handleAccountEmail(job);
+                }
                 break;
             default:
                 throw new Error(`Unknown job type: ${job.type}`);

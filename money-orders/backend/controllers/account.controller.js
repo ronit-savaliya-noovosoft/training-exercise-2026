@@ -97,6 +97,7 @@ async function selectAccount(req, res, next){
 async function createAccount(req, res){
     try{
         const result = await accountService.createAccount(
+            req.user,
             req.body
         );
 
@@ -165,7 +166,7 @@ async function getPendingAccountRequests(req, res){
 
         return res.status(200).json({
             status: "success",
-            message: "Pending Requests fetched successfully",
+            message: "Pending requests fetched successfully",
             requests
         });
     }
@@ -178,11 +179,29 @@ async function getPendingAccountRequests(req, res){
 
 async function cancelRequest(req, res){
     try{
-        await accountService.cancelRequest(req.body.requestId);
+        console.log(req.body);
+        await accountService.cancelRequest(req.body.userId, req.body.requestId);
 
         return res.status(200).json({
             status: "success",
             message: "request cancel successfully",
+        });
+    }
+    catch (e) {
+        return res.status(500).json({
+            message: e.message
+        });
+    }
+}
+
+async function getRequestsByUserId(req, res){
+    try{
+        const requests = await accountService.getRequestsByUserId(req.user);
+
+        return res.status(200).json({
+            status: "success",
+            message: "requests fetched successfully",
+            requests
         });
     }
     catch (e) {
@@ -203,5 +222,6 @@ module.exports = {
     getAllAccounts,
     createRequestForAccountCreation,
     getPendingAccountRequests,
-    cancelRequest
+    cancelRequest,
+    getRequestsByUserId
 };
