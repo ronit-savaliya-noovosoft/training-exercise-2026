@@ -1,6 +1,7 @@
 :root{
     --primary-font-family : "Franklin Gothic Medium", "serif" !important;
-    --primary-bg-color : whitesmoke
+    --primary-bg-color : #EEF2F6;
+    /*--primary-bg-color : #F1F5F9*/
 }
 
 /*Login Page*/

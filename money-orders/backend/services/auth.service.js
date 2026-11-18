@@ -1,8 +1,9 @@
 const authRepository = require("../repositories/auth.repository");
-const accountRepository = require("../repositories/account.repository");
 const db = require("../config/db");
+const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const transporter = require("../config/email");
 
 async function login(email, password){
     const user = await authRepository.findUserByEmail(email);
@@ -99,5 +100,88 @@ async function getMe(user){
     return authRepository.getUserProfile(user.id);
 }
 
+async function forgotPassword(email){
+    const user = await authRepository.findUserByEmail(email);
 
-module.exports = { login, signup, getMe };
+    if(!user){
+        return {
+            status: "success",
+            message: "If the email is registered, a password reset link will be sent."
+        }
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    const tokenHash = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+    await authRepository.deleteOldResetToken(user.id);
+    await authRepository.createPasswordResetToken(user.id, tokenHash);
+
+    const resetLink = `${process.env.FRONTEND_URL}/resetPassword.html?token=${resetToken}`;
+
+    await transporter.sendMail({
+       from: '"Banking App"<banking-app@localhost>',
+       to: user.email,
+       subject: "Reset Your Password",
+       html: `
+            <h2>Password Reset Request</h2>
+            <p>Hello ${user.name},</p>
+            <p>We received a request to reset your password.</p>
+            <p><a href="${resetLink}">Reset Password</a></p>
+            <p>This link expires in 15 minutes.</p>
+            <p>If you did not request this, you can ignore this email</p>
+       `
+    });
+
+    return {
+        status: "success",
+        message: "If the email is registered, a password reset link will be sent."
+    }
+}
+
+async function resetPassword(token, newPassword){
+    if(!token || !newPassword){
+        throw new Error("Token and password are required")
+    }
+
+    if(newPassword.length<8){
+        throw new Error("Password must be at least 8 characters long");
+    }
+
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    const client = await db.connect();
+
+    try{
+        await client.query("BEGIN");
+
+        const resetToken = await authRepository.getValidResetToken(client, tokenHash);
+
+        if(!resetToken){
+            throw new Error("Invalid or expired reset link");
+        }
+
+        await authRepository.updateUserPassword(client, resetToken.user_id, hashedPassword);
+
+        await authRepository.markResetTokenUsed(client, resetToken.id);
+
+        await client.query("COMMIT");
+
+        return {
+            status: "success",
+            message: "Password reset successfully"
+        }
+    }
+    catch (e) {
+        await client.query("ROLLBACK");
+        throw e;
+    }
+    finally {
+        client.release();
+    }
+}
+
+
+module.exports = { login, signup, getMe, forgotPassword, resetPassword };

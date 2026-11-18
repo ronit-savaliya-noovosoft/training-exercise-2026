@@ -8,8 +8,6 @@ async function findUserByEmail(email){
         [email]
     );
 
-    console.log(result);
-
     return result.rows[0];
 }
 
@@ -47,10 +45,54 @@ async function checkEmail(email){
     return result.rowCount;
 }
 
+async function deleteOldResetToken(userId){
+    return await db.query(
+        queries.DELETE_OLD_REST_TOKEN,
+        [userId]
+    );
+}
+
+async function createPasswordResetToken(userId, tokenHash){
+    const result = await db.query(
+        queries.INSERT_RESET_TOKEN,
+        [userId, tokenHash]
+    );
+
+    return result.rows[0];
+}
+
+async function getValidResetToken(client, tokenHash){
+    const result = await client.query(
+        queries.GET_VALID_RESET_TOKEN,
+        [tokenHash]
+    );
+
+    return result.rows[0];
+}
+
+async function updateUserPassword(client, userId, password){
+    return await client.query(
+        queries.UPDATE_USER_PASSWORD,
+        [password, userId]
+    );
+}
+
+async function markResetTokenUsed(client, tokenId){
+    return await client.query(
+        queries.MARK_RESET_TOKEN_USED,
+        [tokenId]
+    );
+}
+
 module.exports = {
     getCustomerProfile,
     getUserProfile,
     createCustomer,
     findUserByEmail,
     checkEmail,
+    deleteOldResetToken,
+    createPasswordResetToken,
+    getValidResetToken,
+    updateUserPassword,
+    markResetTokenUsed
 };

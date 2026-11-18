@@ -98,4 +98,50 @@ async function logout(req, res){
     });
 }
 
-module.exports = { login, signup, logout, getMe };
+async function forgotPassword(req, res, next){
+    try{
+        const { email } = req.body;
+
+        if(!email){
+            return res.status(400).json({
+                status: "failed",
+                message: "Email is required"
+            })
+        }
+
+        const result = await authService.forgotPassword(email);
+
+        return res.status(200).json(result);
+    }
+    catch (e) {
+        return res.status(500).json({
+            message: e.message
+        });
+    }
+}
+
+async function resetPassword(req, res, next){
+    try{
+        const { token, newPassword } = req.body;
+
+        console.log(token, newPassword);
+
+        if(!token || !newPassword){
+            return res.status(400).json({
+                status: "failed",
+                message: "Token and new password are required"
+            });
+        }
+
+        const result = await authService.resetPassword(token, newPassword);
+
+        return res.status(200).json(result);
+    }
+    catch (e) {
+        return res.status(500).json({
+            message: e.message
+        });
+    }
+}
+
+module.exports = { login, signup, logout, getMe, forgotPassword, resetPassword };
