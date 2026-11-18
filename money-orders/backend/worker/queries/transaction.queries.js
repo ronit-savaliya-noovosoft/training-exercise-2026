@@ -34,12 +34,11 @@ const GET_NEXT_PENDING_TRANSACTION = `
 `;
 
 const GET_ACCOUNTS_FOR_UPDATE = `
-    SELECT 
-        id, 
-        balance
-    FROM ACCOUNTS
-    WHERE id = ANY($1)
-    AND is_active = true
+    SELECT a.id as id, a.account_number, u.name, u.email, a.balance
+    FROM accounts a
+    JOIN users u
+    ON u.id=a.cust_id
+    WHERE a.id=ANY($1) AND a.is_active = true
     FOR UPDATE
 `;
 

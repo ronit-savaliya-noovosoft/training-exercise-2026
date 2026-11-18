@@ -24,7 +24,7 @@ const GET_ACCOUNT_BALANCE = `
 `;
 
 const GET_ACCOUNT_DETAILS = `
-    SELECT a.id as id, a.account_number, u.name 
+    SELECT a.id as id, a.account_number, u.name, u.email , a.balance
     FROM accounts a
     JOIN users u 
     ON u.id=a.cust_id

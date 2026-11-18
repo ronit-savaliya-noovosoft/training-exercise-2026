@@ -69,7 +69,6 @@ async function handleAccountEmail(job){
     const { account } = job.data;
 
     const customer = await authRepository.getUserProfile(account.holderId);
-    console.log(customer);
     let html;
 
     if(account.status==="approved"){

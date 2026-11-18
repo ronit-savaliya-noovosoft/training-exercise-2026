@@ -1,9 +1,5 @@
 const express= require('express');
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-
 const authenticateToken = require('../middlewares/auth.middleware')
-const db = require("../config/db");
 const authController = require("../controllers/auth.controller");
 const authorizeRole = require('../middlewares/role.middleware');
 

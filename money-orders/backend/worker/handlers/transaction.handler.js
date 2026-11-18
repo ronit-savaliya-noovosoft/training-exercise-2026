@@ -1,5 +1,7 @@
 const transactionRepository = require("../repositories/transaction.repository");
 const { JOB_TYPE } = require("../constants/jobs.constants");
+const transporter = require("../../config/email");
+const accountRepository = require("../../repositories/account.repository");
 
 async function handleTransaction(job){
     const transactionId = job.data.transactionId;
@@ -10,9 +12,6 @@ async function handleTransaction(job){
 
     await transactionRepository.withTransaction(async (client) => {
        const transaction = await transactionRepository.getTransactionForUpdate(client, transactionId);
-
-       console.log(transactionId);
-       console.log(transaction);
 
        if(!transaction){
            throw new Error("Transaction not found");
@@ -43,6 +42,7 @@ async function handleTransaction(job){
 
        if(type === JOB_TYPE.DEPOSIT){
            await transactionRepository.depositAmount(client, amount, toAccountId);
+           await mailForTransaction(type, amount, accounts[0]);
        }
 
        else if(type === JOB_TYPE.WITHDRAWAL){
@@ -57,9 +57,10 @@ async function handleTransaction(job){
        }
 
        else if(type === JOB_TYPE.TRANSFER){
-           const account = accounts.find(account => account.id === fromAccountId);
+           const fromAccount = accounts.find(account => account.id === fromAccountId);
+           const toAccount = accounts.find(account => account.id === toAccountId);
 
-           const success = await processWithdrawal(client, amount, account);
+           const success = await processWithdrawal(client, amount, fromAccount);
 
            if(!success){
                await transactionRepository.markFailed(client, id);
@@ -67,6 +68,7 @@ async function handleTransaction(job){
            }
 
            await transactionRepository.depositAmount(client, amount, toAccountId);
+           await mailForTransaction("deposit", amount, toAccount);
        }
 
        else{
@@ -82,7 +84,34 @@ async function processWithdrawal(client, amount, account){
         return false;
     }
 
-    return await transactionRepository.withdrawAmount(client, amount, account.id);
+    const transaction = await transactionRepository.withdrawAmount(client, amount, account.id);
+    await mailForTransaction("withdrawal", -amount, account);
+
+    return transaction;
+}
+
+async function mailForTransaction(type, amount, account){
+    const html = `
+            <h3>Dear ${account.name},</h3>
+            <p>Please be informed that a ${type} transaction has been processed for your account. Here are the details for your records:</p>
+            <ul>
+                <li>Transaction Type: ${type}</li>
+                <li>Amount: ${Math.abs(amount)}</li>
+                <li>Account/Reference Number: ${account.account_number}</li>
+                <li>Current Balance: ${Number(account.balance)+Number(amount)}</li>
+            </ul>
+            <p>If you have any questions or need further assistance, please feel free to reply to this email or contact us.</p>
+                
+            <h3>Best regards,</h3>
+            <h4>Money Order Bank Services</h4>
+    `;
+
+    await transporter.sendMail({
+        from: '"Banking App" <banking-app@localhost>',
+        to: account.email,
+        subject: "Transaction alert!",
+        html: html
+    });
 }
 
 module.exports = { handleTransaction };
