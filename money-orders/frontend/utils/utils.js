@@ -3,14 +3,14 @@ import {getBalanceOfSelectedCustomer} from "../modules/dashboard/services/accoun
 
 async function verifyAmount(amount, element, accountId, type='withdraw'){
     if(amount===""){
-        element.classList.remove('text-success');
-        element.classList.add('text-danger');
+        element.classList.remove("alert", "alert-success");
+        element.classList.add("alert", "alert-danger");
         element.textContent = "Amount is required";
         return false;
     }
     else if(amount<=0){
-        element.classList.remove('text-success');
-        element.classList.add('text-danger');
+        element.classList.remove("alert", "alert-success");
+        element.classList.add("alert", "alert-danger");
         element.textContent = "Invalid Amount";
         return false;
     }
@@ -18,8 +18,8 @@ async function verifyAmount(amount, element, accountId, type='withdraw'){
         const result = await getBalanceOfSelectedCustomer(accountId);
 
         if(Number(result.balance)<Number(amount) && type !== 'deposit'){
-            element.classList.remove('text-success');
-            element.classList.add('text-danger');
+            element.classList.remove("alert", "alert-success");
+            element.classList.add("alert", "alert-danger");
             element.textContent = "Insufficient Balance";
 
             return false;

@@ -49,8 +49,8 @@ depositBtn.addEventListener('click', async function deposit(e) {
     try {
         const data = await depositInAccount(accountId, amount);
 
-        message.classList.remove('text-danger');
-        message.classList.add('text-success');
+        message.classList.remove("alert", "alert-danger");
+        message.classList.add("alert", "alert-success");
         deposit_amount.value = "";
         depositBtn.disabled = true;
 
@@ -62,8 +62,8 @@ depositBtn.addEventListener('click', async function deposit(e) {
             message.style.display = "none";
         }, MESSAGE_SHOW_TIME);
     } catch (error) {
-        message.classList.remove('text-success');
-        message.classList.add('text-danger');
+        message.classList.remove("alert", "alert-success");
+        message.classList.add("alert", "alert-danger");
         message.textContent = error.message;
         console.log("Error:", error);
     }
@@ -84,8 +84,8 @@ withdrawBtn.addEventListener('click', async function withdraw(e) {
         const data = await withdrawFromAccount(accountId, amount);
 
 
-        message.classList.remove('text-danger');
-        message.classList.add('text-success');
+        message.classList.remove("alert", "alert-danger");
+        message.classList.add("alert", "alert-success");
         withdraw_amount.value = "";
         withdrawBtn.disabled = true;
 
@@ -96,8 +96,8 @@ withdrawBtn.addEventListener('click', async function withdraw(e) {
             message.style.display = "none";
         }, MESSAGE_SHOW_TIME);
     } catch (error) {
-        message.classList.remove('text-success');
-        message.classList.add('text-danger');
+        message.classList.remove("alert", "alert-success");
+        message.classList.add("alert", "alert-danger");
         message.textContent = error.message;
         console.log("Error:", error);
     }
@@ -118,8 +118,8 @@ transferBtn.addEventListener('click', async function transfer(e) {
     try {
         const data = await transferFromAccount(fromAccountId, toAccountId, amount);
 
-        message.classList.remove('text-danger');
-        message.classList.add('text-success');
+        message.classList.remove("alert", "alert-danger");
+        message.classList.add("alert", "alert-success");
         transfer_amount.value = "";
         transferBtn.disabled = true;
 
@@ -130,8 +130,8 @@ transferBtn.addEventListener('click', async function transfer(e) {
             message.style.display = "none";
         }, MESSAGE_SHOW_TIME);
     } catch (error) {
-        message.classList.remove('text-success');
-        message.classList.add('text-danger');
+        message.classList.remove("alert", "alert-success");
+        message.classList.add("alert", "alert-danger");
         message.textContent = error.message;
         console.log("Error:", error);
     }
@@ -211,7 +211,7 @@ export async function fetchTransactionHistory(page = 1) {
             currentCount: result.transactions.length
         });
     } catch (error) {
-        message.classList.add('text-danger');
+        message.classList.add("alert", "alert-danger");
         message.innerText = error.message;
         console.log(error);
     }
@@ -243,15 +243,15 @@ email.addEventListener("click", async function email() {
     const toDate = toDateElement.value;
 
     if (records === "" || Number(records) <= 0) {
-        message.classList.remove('text-success');
-        message.classList.add('text-danger');
+        message.classList.remove("alert", "alert-success");
+        message.classList.add("alert", "alert-danger");
         message.textContent = "Please enter how many transaction you need, Empty or negative value not allowed";
         return;
     }
 
     if (fromDate && toDate && fromDate > toDate) {
-        message.classList.remove('text-success');
-        message.classList.add('text-danger');
+        message.classList.remove("alert", "alert-success");
+        message.classList.add("alert", "alert-danger");
         message.textContent = "From date can not be after to date";
         return;
     }
@@ -266,8 +266,8 @@ email.addEventListener("click", async function email() {
         fromDateElement.value = null;
         toDateElement.value = null;
 
-        message.classList.remove('text-danger');
-        message.classList.add('text-success');
+        message.classList.remove("alert", "alert-danger");
+        message.classList.add("alert", "alert-success");
         message.textContent = `${result.message}`;
         message.style.display = "block";
         setTimeout(() => {
@@ -275,8 +275,8 @@ email.addEventListener("click", async function email() {
         }, MESSAGE_SHOW_TIME);
 
     } catch (e) {
-        message.classList.remove('text-success');
-        message.classList.add('text-danger');
+        message.classList.remove("alert", "alert-success");
+        message.classList.add("alert", "alert-danger");
         message.textContent = e.message;
     } finally {
         button.disabled = false;

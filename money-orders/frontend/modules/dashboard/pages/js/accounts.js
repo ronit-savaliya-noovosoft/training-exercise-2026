@@ -141,7 +141,7 @@ verifyBalanceForm.addEventListener("submit", async (e) => {
     }
     catch (e){
         message.textContent = e.message;
-        message.classList.add("text-danger");
+        message.classList.add("alert", "alert-danger");
         console.log(e.message);
     }
 });

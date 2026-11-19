@@ -162,7 +162,7 @@ async function loadRequests(){
         if(result.requests.length === 0){
             requestsListTable.innerHTML = `
                 <tr>
-                    <td colspan="3" class="text-center text-muted py-4">No pending requests found.</td>
+                    <td colspan="3" class="text-center text-muted py-4">No Requests found.</td>
                 </tr>
             `;
             return;
